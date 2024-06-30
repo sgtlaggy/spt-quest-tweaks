@@ -5,34 +5,7 @@ import { ILogger } from "@spt-aki/models/spt/utils/ILogger";
 import { DatabaseServer } from "@spt-aki/servers/DatabaseServer";
 import { IQuestCondition } from "@spt-aki/models/eft/common/tables/IQuest";
 
-import { CONFIG } from "./config";
-
-
-const targetTypes = {
-    any: [[], "Any", "target", "s"],
-    pmc: [[], "AnyPmc", "PMC operative", "s"],
-    usec: [[], "Usec", "USEC PMC operative", "s"],
-    bear: [[], "Bear", "BEAR PMC operative", "s"],
-    scav: [[], "Savage", "scav", "s"],
-    raider: [["pmcBot"], "Savage", "raider", "s"],
-    rogue: [["exUsec"], "Savage", "rogue", "s"],
-    cultist: [["sectantPriest", "sectantWarrior"], "Savage", "cultist", "s"],
-    boss: [[
-        "bossBully",            // reshala
-        "bossKilla",
-        "bossGluhar",
-        "bossKojaniy",          // shturman
-        "bossSanitar",
-        "bossTagilla",
-        "bossZryachiy",
-        "bossKolontay",
-        "bossBoar",             // kaban
-        "bossKnight",
-        "followerBigPipe",
-        "followerBirdEye",
-        "sectantPriest"
-    ], "Savage", "boss", "es"],
-}
+import { CONFIG, gunsmithChallengeTargetTypes } from "./config";
 
 
 class Mod implements IPostDBLoadMod {
@@ -44,7 +17,7 @@ class Mod implements IPostDBLoadMod {
         const locales = db.locales.global;
         const quests = db.templates.quests;
 
-        const [scavType, target, targetSingular, targetPluralSuffix] = targetTypes[CONFIG.gunsmithChallenge.targetType.toLowerCase()] || [undefined, undefined, undefined, undefined];
+        const [scavType, target, targetSingular, targetPluralSuffix] = gunsmithChallengeTargetTypes[CONFIG.gunsmithChallenge.targetType.toLowerCase()] || [undefined, undefined, undefined, undefined];
         const targetName = `${targetSingular}${CONFIG.gunsmithChallenge.killsRequired > 1 ? targetPluralSuffix : ""}`;
 
         if (CONFIG.revealAllQuestObjectives) {
@@ -53,7 +26,7 @@ class Mod implements IPostDBLoadMod {
 
         if (CONFIG.gunsmithChallenge.killsRequired > 0) {
             if (scavType === undefined) {
-                log(`${CONFIG.gunsmithChallenge.targetType} is not a valid target type, skipping.\nValid options: any, pmc, usec, bear, scav, raider, rogue, cultist, boss`);
+                log(`${CONFIG.gunsmithChallenge.targetType} is not a valid target type, skipping.\nValid options: ${Object.keys(gunsmithChallengeTargetTypes).join(", ")}`);
                 CONFIG.gunsmithChallenge.killsRequired = 0;
             } else {
                 log(`Eliminate ${CONFIG.gunsmithChallenge.killsRequired} ${targetName} with each Gunsmith weapon.`);
