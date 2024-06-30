@@ -1,5 +1,11 @@
 # sgtlaggy's Quest Tweaks
 
+## Reveal All Quest Objectives
+
+This mod will reveal all objectives that are hidden by default and only show up after completing other objectives.
+
+One example is Broadcast - Part 1, the objective to place the Signal Jammer doesn't appear until you've entered the room.
+
 ## Gunsmith Challenge
 
 Inspired by [SheefGG](https://www.twitch.tv/SheefGG)'s hardcore gunsmith challenge.

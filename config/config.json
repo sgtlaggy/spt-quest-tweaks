@@ -2,5 +2,6 @@
     "gunsmithChallenge": {
         "killsRequired": 0,
         "targetType": "pmc"
-    }
+    },
+    "revealAllQuestObjectives": false
 }

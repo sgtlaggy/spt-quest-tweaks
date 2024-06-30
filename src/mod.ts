@@ -8,8 +8,6 @@ import { IQuestCondition } from "@spt-aki/models/eft/common/tables/IQuest";
 import { CONFIG } from "./config";
 
 
-
-
 const targetTypes = {
     any: [[], "Any", "target", "s"],
     pmc: [[], "AnyPmc", "PMC operative", "s"],
@@ -40,20 +38,35 @@ const targetTypes = {
 class Mod implements IPostDBLoadMod {
     public postDBLoad(container: DependencyContainer): void {
         const logger = container.resolve<ILogger>("WinstonLogger");
+        const log = (msg: string) => logger.info(`[QuestTweaks] ${msg}`);
+
         const db = container.resolve<DatabaseServer>("DatabaseServer").getTables();
         const locales = db.locales.global;
         const quests = db.templates.quests;
 
-        const [scavType, target, targetSingular, targetPluralSuffix] = targetTypes[CONFIG.gunsmithChallenge.targetType.toLowerCase()] || [undefined, undefined, undefined];
+        const [scavType, target, targetSingular, targetPluralSuffix] = targetTypes[CONFIG.gunsmithChallenge.targetType.toLowerCase()] || [undefined, undefined, undefined, undefined];
         const targetName = `${targetSingular}${CONFIG.gunsmithChallenge.killsRequired > 1 ? targetPluralSuffix : ""}`;
 
-        if (scavType === undefined) {
-            throw new Error(`[GunsmithChallenge] ${CONFIG.gunsmithChallenge.targetType} is not a valid target type.\nValid options: any, pmc, usec, bear, scav, raider, rogue, cultist, boss`);
-        } else if (CONFIG.gunsmithChallenge.killsRequired > 0) {
-            logger.info(`[GunsmithChallenge] Eliminate ${CONFIG.gunsmithChallenge.killsRequired} ${targetName} with each Gunsmith weapon.`);
+        if (CONFIG.revealAllQuestObjectives) {
+            log("Revealing hidden/conditional objectives.");
+        }
+
+        if (CONFIG.gunsmithChallenge.killsRequired > 0) {
+            if (scavType === undefined) {
+                log(`${CONFIG.gunsmithChallenge.targetType} is not a valid target type, skipping.\nValid options: any, pmc, usec, bear, scav, raider, rogue, cultist, boss`);
+                CONFIG.gunsmithChallenge.killsRequired = 0;
+            } else {
+                log(`Eliminate ${CONFIG.gunsmithChallenge.killsRequired} ${targetName} with each Gunsmith weapon.`);
+            }
         }
 
         for (const quest of Object.values(quests)) {
+            if (CONFIG.revealAllQuestObjectives) {
+                for (const objective of quest.conditions.AvailableForFinish) {
+                    objective.visibilityConditions = [];
+                }
+            }
+
             if (CONFIG.gunsmithChallenge.killsRequired > 0 && quest.QuestName?.startsWith("Gunsmith")) {
                 quest.conditions.AvailableForFinish.filter((cond) => {
                     return cond.conditionType === "WeaponAssembly";

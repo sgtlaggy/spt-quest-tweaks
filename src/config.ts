@@ -7,6 +7,7 @@ class IGunsmithChallengeConfig {
 
 class IConfig {
     gunsmithChallenge: IGunsmithChallengeConfig
+    revealAllQuestObjectives: boolean
 }
 
 export const CONFIG: IConfig = config;
