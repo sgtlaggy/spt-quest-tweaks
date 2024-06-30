@@ -5,7 +5,35 @@ import { ILogger } from "@spt-aki/models/spt/utils/ILogger";
 import { DatabaseServer } from "@spt-aki/servers/DatabaseServer";
 import { IQuestCondition } from "@spt-aki/models/eft/common/tables/IQuest";
 
-import { killsRequired } from "../config/config.json";
+import { killsRequired, targetType } from "../config/config.json";
+
+
+const targetTypes = {
+    any: [[], "Any", "target", "s"],
+    pmc: [[], "AnyPmc", "PMC operative", "s"],
+    usec: [[], "Usec", "USEC PMC operative", "s"],
+    bear: [[], "Bear", "BEAR PMC operative", "s"],
+    scav: [[], "Savage", "scav", "s"],
+    raider: [["pmcBot"], "Savage", "raider", "s"],
+    rogue: [["exUsec"], "Savage", "rogue", "s"],
+    cultist: [["sectantPriest", "sectantWarrior"], "Savage", "cultist", "s"],
+    boss: [[
+        "bossBully",            // reshala
+        "bossKilla",
+        "bossGluhar",
+        "bossKojaniy",          // shturman
+        "bossSanitar",
+        "bossTagilla",
+        "bossZryachiy",
+        "bossKolontay",
+        "bossBoar",             // kaban
+        "bossKnight",
+        "followerBigPipe",
+        "followerBirdEye",
+        "sectantPriest"
+    ], "Savage", "boss", "es"],
+}
+
 
 class Mod implements IPostDBLoadMod {
     public postDBLoad(container: DependencyContainer): void {
@@ -14,12 +42,17 @@ class Mod implements IPostDBLoadMod {
         const locales = db.locales.global;
         const quests = db.templates.quests;
 
-        if (!killsRequired) {
+        const [scavType, target, targetSingular, targetPluralSuffix] = targetTypes[targetType.toLowerCase()] || [undefined, undefined, undefined];
+        const targetName = `${targetSingular}${killsRequired > 1 ? targetPluralSuffix : ""}`;
+
+        if (killsRequired <= 0) {
             logger.info("[GunsmithChallenge] Not adding eliminations to gunsmith quests.")
             return;
+        } else if (scavType === undefined) {
+            throw new Error(`[GunsmithChallenge] ${targetType} is not a valid target type.\nValid options: any, pmc, usec, bear, scav, boss, goons`);
         }
 
-        logger.info(`[GunsmithChallenge] Adding ${killsRequired} elimination requirement to gunsmith quests.`)
+        logger.info(`[GunsmithChallenge] Eliminate ${killsRequired} ${targetName} with each Gunsmith weapon.`);
 
         for (const quest of Object.values(quests)) {
             if (killsRequired && quest.QuestName?.startsWith("Gunsmith")) {
@@ -54,8 +87,8 @@ class Mod implements IPostDBLoadMod {
                                     enemyHealthEffects: [],
                                     id: `${localeKey} condition`,
                                     resetOnSessionEnd: false,
-                                    savageRole: [],
-                                    target: "AnyPmc",
+                                    savageRole: scavType,
+                                    target: target,
                                     value: 1,
                                     weapon: [weaponCondition.target].flat(),
                                     weaponCaliber: [],
@@ -75,7 +108,7 @@ class Mod implements IPostDBLoadMod {
                     const weaponId = cond.counter.conditions[0].weapon[0];
                     const weapon = locales.en[`${weaponId} ShortName`];
                     for (const locale of Object.values(locales)) {
-                        locale[cond.id] = `Eliminate ${killsRequired} PMCs with the ${weapon}`;
+                        locale[cond.id] = `Eliminate ${killsRequired} ${targetName} with the ${weapon}`;
                     }
                 });
             }

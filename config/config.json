@@ -1,3 +1,4 @@
 {
-    "killsRequired": 5
+    "killsRequired": 5,
+    "targetType": "pmc"
 }
