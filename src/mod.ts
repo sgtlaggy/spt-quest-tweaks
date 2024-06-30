@@ -55,8 +55,10 @@ class Mod implements IPostDBLoadMod {
         logger.info(`[GunsmithChallenge] Eliminate ${killsRequired} ${targetName} with each Gunsmith weapon.`);
 
         for (const quest of Object.values(quests)) {
-            if (killsRequired && quest.QuestName?.startsWith("Gunsmith")) {
-                quest.conditions.AvailableForFinish.map((weaponCondition) => {
+            if (quest.QuestName?.startsWith("Gunsmith")) {
+                quest.conditions.AvailableForFinish.filter((cond) => {
+                    return cond.conditionType === "WeaponAssembly";
+                }).map((weaponCondition) => {
                     const localeKey = `${quest._id} ${weaponCondition.id} challengeElims`;
 
                     // @ts-ignore                  containsItems undeclared/undocumented
