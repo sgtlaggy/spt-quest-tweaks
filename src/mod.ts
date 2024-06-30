@@ -24,6 +24,10 @@ class Mod implements IPostDBLoadMod {
             log("Revealing hidden/conditional objectives.");
         }
 
+        if (CONFIG.removeTimeGates) {
+            log("Removing time gates from all quests.")
+        }
+
         if (CONFIG.gunsmithChallenge.killsRequired > 0) {
             if (scavType === undefined) {
                 log(`${CONFIG.gunsmithChallenge.targetType} is not a valid target type, skipping.\nValid options: ${Object.keys(gunsmithChallengeTargetTypes).join(", ")}`);
@@ -37,6 +41,14 @@ class Mod implements IPostDBLoadMod {
             if (CONFIG.revealAllQuestObjectives) {
                 for (const objective of quest.conditions.AvailableForFinish) {
                     objective.visibilityConditions = [];
+                }
+            }
+
+            if (CONFIG.removeTimeGates) {
+                for (const prereq of quest.conditions.AvailableForStart) {
+                    if (prereq.availableAfter) {
+                        prereq.availableAfter = 0;
+                    }
                 }
             }
 
