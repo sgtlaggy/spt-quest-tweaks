@@ -5,7 +5,9 @@ import { ILogger } from "@spt-aki/models/spt/utils/ILogger";
 import { DatabaseServer } from "@spt-aki/servers/DatabaseServer";
 import { IQuestCondition } from "@spt-aki/models/eft/common/tables/IQuest";
 
-import { killsRequired, targetType } from "../config/config.json";
+import { CONFIG } from "./config";
+
+
 
 
 const targetTypes = {
@@ -42,20 +44,17 @@ class Mod implements IPostDBLoadMod {
         const locales = db.locales.global;
         const quests = db.templates.quests;
 
-        const [scavType, target, targetSingular, targetPluralSuffix] = targetTypes[targetType.toLowerCase()] || [undefined, undefined, undefined];
-        const targetName = `${targetSingular}${killsRequired > 1 ? targetPluralSuffix : ""}`;
+        const [scavType, target, targetSingular, targetPluralSuffix] = targetTypes[CONFIG.gunsmithChallenge.targetType.toLowerCase()] || [undefined, undefined, undefined];
+        const targetName = `${targetSingular}${CONFIG.gunsmithChallenge.killsRequired > 1 ? targetPluralSuffix : ""}`;
 
-        if (killsRequired <= 0) {
-            logger.info("[GunsmithChallenge] Not adding eliminations to gunsmith quests.")
-            return;
-        } else if (scavType === undefined) {
-            throw new Error(`[GunsmithChallenge] ${targetType} is not a valid target type.\nValid options: any, pmc, usec, bear, scav, boss, goons`);
+        if (scavType === undefined) {
+            throw new Error(`[GunsmithChallenge] ${CONFIG.gunsmithChallenge.targetType} is not a valid target type.\nValid options: any, pmc, usec, bear, scav, raider, rogue, cultist, boss`);
+        } else if (CONFIG.gunsmithChallenge.killsRequired > 0) {
+            logger.info(`[GunsmithChallenge] Eliminate ${CONFIG.gunsmithChallenge.killsRequired} ${targetName} with each Gunsmith weapon.`);
         }
 
-        logger.info(`[GunsmithChallenge] Eliminate ${killsRequired} ${targetName} with each Gunsmith weapon.`);
-
         for (const quest of Object.values(quests)) {
-            if (quest.QuestName?.startsWith("Gunsmith")) {
+            if (CONFIG.gunsmithChallenge.killsRequired > 0 && quest.QuestName?.startsWith("Gunsmith")) {
                 quest.conditions.AvailableForFinish.filter((cond) => {
                     return cond.conditionType === "WeaponAssembly";
                 }).map((weaponCondition) => {
@@ -66,7 +65,7 @@ class Mod implements IPostDBLoadMod {
 
                     const elimCondition: IQuestCondition = {
                         id: localeKey,
-                        value: killsRequired,
+                        value: CONFIG.gunsmithChallenge.killsRequired,
                         conditionType: "CounterCreator",
                         counter: {
                             id: `${localeKey} counter`,
@@ -110,7 +109,7 @@ class Mod implements IPostDBLoadMod {
                     const weaponId = cond.counter.conditions[0].weapon[0];
                     const weapon = locales.en[`${weaponId} ShortName`];
                     for (const locale of Object.values(locales)) {
-                        locale[cond.id] = `Eliminate ${killsRequired} ${targetName} with the ${weapon}`;
+                        locale[cond.id] = `Eliminate ${CONFIG.gunsmithChallenge.killsRequired} ${targetName} with the ${weapon}`;
                     }
                 });
             }

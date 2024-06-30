@@ -1,4 +1,6 @@
 {
-    "killsRequired": 5,
-    "targetType": "pmc"
+    "gunsmithChallenge": {
+        "killsRequired": 0,
+        "targetType": "pmc"
+    }
 }

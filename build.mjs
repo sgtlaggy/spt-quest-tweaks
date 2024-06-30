@@ -214,14 +214,17 @@ async function loadPackageJson(currentDir) {
 }
 
 /**
- * Returns the project name from the `package.json` file.
+ * Returns the project name constructed from the `package.json` file.
+ * The name is created by concatenating the author and project names.
  *
  * @param {Object} packageJson - A JSON object containing the contents of the `package.json` file.
  * @returns {string} A string representing the constructed project name.
  */
 function createProjectName(packageJson) {
     // Remove any non-alphanumeric characters from the name.
-    return packageJson.name.replace(/\W/g, "");
+    const author = packageJson.author.replace(/\W/g, "");
+    const project = packageJson.name.replace(/\W/g, "");
+    return `${author}-${project}`
 }
 
 /**
