@@ -1,6 +1,7 @@
 {
     "revealAllQuestObjectives": false,
     "removeTimeGates": false,
+    "addMissingSetupShotguns": false,
     "gunsmithChallenge": {
         "killsRequired": 0,
         "targetType": "pmc"

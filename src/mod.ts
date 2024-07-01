@@ -8,6 +8,13 @@ import { IQuestCondition } from "@spt-aki/models/eft/common/tables/IQuest";
 import { CONFIG, gunsmithChallengeTargetTypes } from "./config";
 
 
+export const IDS = {
+    setupQuest: "5c1234c286f77406fa13baeb",
+    mp18: "61f7c9e189e6fb1a5e3ea78d",
+    mp43SawedOff: "64748cb8de82c85eaf0a273a",
+};
+
+
 class Mod implements IPostDBLoadMod {
     public postDBLoad(container: DependencyContainer): void {
         const logger = container.resolve<ILogger>("WinstonLogger");
@@ -26,6 +33,15 @@ class Mod implements IPostDBLoadMod {
 
         if (CONFIG.removeTimeGates) {
             log("Removing time gates from all quests.")
+        }
+
+        if (CONFIG.addMissingSetupShotguns) {
+            log("Making the MP-18 & MP-43 sawed off valid for Setup.");
+            const setupShotguns = quests[IDS.setupQuest].conditions
+                .AvailableForFinish[0].counter.conditions
+                .find((cond) => cond.conditionType === "Kills").weapon;
+            setupShotguns.push(IDS.mp18);
+            setupShotguns.push(IDS.mp43SawedOff);
         }
 
         if (CONFIG.gunsmithChallenge.killsRequired > 0) {

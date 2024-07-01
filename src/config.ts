@@ -8,6 +8,7 @@ class IGunsmithChallengeConfig {
 class IConfig {
     revealAllQuestObjectives: boolean
     removeTimeGates: boolean
+    addMissingSetupShotguns: boolean
     gunsmithChallenge: IGunsmithChallengeConfig
 }
 
