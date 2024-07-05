@@ -16,6 +16,10 @@ The Setup quest requires an MP-series shotgun but this does not include the MP-4
 
 Rant: The MP-18 is classified as a shotgun in-game due to Russian law classifying all smooth-bore rifles as such. By that logic, the .366 rifles (VPO-209 and VPO-215) should also be classified as shotguns but they are not.
 
+## Only Require Level to start Lightkeeper
+
+This option will remove all the prerequisite quests to start `Network Provider - Part 1` and will only require a specific level. A value of `0` will disable this feature and leave the prerequisites in place.
+
 ## Gunsmith Challenge
 
 Inspired by [SheefGG](https://www.twitch.tv/SheefGG)'s hardcore gunsmith challenge.

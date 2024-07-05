@@ -2,6 +2,7 @@
     "revealAllQuestObjectives": false,
     "removeTimeGates": false,
     "addMissingSetupShotguns": false,
+    "lightkeeperOnlyRequireLevel": 0,
     "gunsmithChallenge": {
         "killsRequired": 0,
         "targetType": "pmc"

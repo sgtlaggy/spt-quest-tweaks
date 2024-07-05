@@ -9,6 +9,7 @@ class IConfig {
     revealAllQuestObjectives: boolean
     removeTimeGates: boolean
     addMissingSetupShotguns: boolean
+    lightkeeperOnlyRequireLevel: number
     gunsmithChallenge: IGunsmithChallengeConfig
 }
 

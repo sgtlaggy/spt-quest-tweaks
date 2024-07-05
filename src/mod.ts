@@ -12,6 +12,7 @@ export const IDS = {
     setupQuest: "5c1234c286f77406fa13baeb",
     mp18: "61f7c9e189e6fb1a5e3ea78d",
     mp43SawedOff: "64748cb8de82c85eaf0a273a",
+    networkProviderPart1: "625d6ff5ddc94657c21a1625",
 };
 
 
@@ -42,6 +43,25 @@ class Mod implements IPostDBLoadMod {
                 .find((cond) => cond.conditionType === "Kills").weapon;
             setupShotguns.push(IDS.mp18);
             setupShotguns.push(IDS.mp43SawedOff);
+        }
+
+        if (CONFIG.lightkeeperOnlyRequireLevel) {
+            const level = CONFIG.lightkeeperOnlyRequireLevel;
+            log(`Removing Network Provider prerequisites, player must be at least level ${level}.`);
+            const condition: IQuestCondition = {
+                "id": `${IDS.networkProviderPart1}_levelCond`,
+                "conditionType": "Level",
+                "compareMethod": ">=",
+                "value": level,
+                "dynamicLocale": false,
+                "globalQuestCounterId": "",
+                "index": 0,
+                "parentId": "",
+                "visibilityConditions": [],
+                // `target` is not optional, but it should be
+                "target": ""
+            };
+            quests[IDS.networkProviderPart1].conditions.AvailableForStart = [condition];
         }
 
         if (CONFIG.gunsmithChallenge.killsRequired > 0) {
