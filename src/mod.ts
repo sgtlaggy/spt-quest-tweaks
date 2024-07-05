@@ -1,9 +1,9 @@
 import { DependencyContainer } from "tsyringe";
 
-import { IPostDBLoadMod } from "@spt-aki/models/external/IPostDBLoadMod";
-import { ILogger } from "@spt-aki/models/spt/utils/ILogger";
-import { DatabaseServer } from "@spt-aki/servers/DatabaseServer";
-import { IQuestCondition } from "@spt-aki/models/eft/common/tables/IQuest";
+import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
+import { ILogger } from "@spt/models/spt/utils/ILogger";
+import { DatabaseServer } from "@spt/servers/DatabaseServer";
+import { IQuestCondition } from "@spt/models/eft/common/tables/IQuest";
 
 import { CONFIG, gunsmithChallengeTargetTypes } from "./config";
 
