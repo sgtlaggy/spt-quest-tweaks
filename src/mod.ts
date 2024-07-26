@@ -1,17 +1,17 @@
 import { DependencyContainer } from "tsyringe";
 
+import { IQuestCondition } from "@spt/models/eft/common/tables/IQuest";
+import { QuestTypeEnum } from "@spt/models/enums/QuestTypeEnum";
+import { Weapons } from "@spt/models/enums/Weapons";
 import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 import { DatabaseServer } from "@spt/servers/DatabaseServer";
-import { IQuestCondition } from "@spt/models/eft/common/tables/IQuest";
 
 import { CONFIG, gunsmithChallengeTargetTypes } from "./config";
 
 
 export const IDS = {
     setupQuest: "5c1234c286f77406fa13baeb",
-    mp18: "61f7c9e189e6fb1a5e3ea78d",
-    mp43SawedOff: "64748cb8de82c85eaf0a273a",
     networkProviderPart1: "625d6ff5ddc94657c21a1625",
 };
 
@@ -41,25 +41,25 @@ class Mod implements IPostDBLoadMod {
             const setupShotguns = quests[IDS.setupQuest].conditions
                 .AvailableForFinish[0].counter.conditions
                 .find((cond) => cond.conditionType === "Kills").weapon;
-            setupShotguns.push(IDS.mp18);
-            setupShotguns.push(IDS.mp43SawedOff);
+            setupShotguns.push(Weapons.SHOTGUN_762X54R_MP_18);
+            setupShotguns.push(Weapons.SHOTGUN_12G_SAWED_OFF);
         }
 
         if (CONFIG.lightkeeperOnlyRequireLevel) {
             const level = CONFIG.lightkeeperOnlyRequireLevel;
             log(`Removing Network Provider prerequisites, player must be at least level ${level}.`);
             const condition: IQuestCondition = {
-                "id": `${IDS.networkProviderPart1}_levelCond`,
-                "conditionType": "Level",
-                "compareMethod": ">=",
-                "value": level,
-                "dynamicLocale": false,
-                "globalQuestCounterId": "",
-                "index": 0,
-                "parentId": "",
-                "visibilityConditions": [],
+                id: `${IDS.networkProviderPart1}_levelCond`,
+                conditionType: "Level",
+                compareMethod: ">=",
+                value: level,
+                dynamicLocale: false,
+                globalQuestCounterId: "",
+                index: 0,
+                parentId: "",
+                visibilityConditions: [],
                 // `target` is not optional, but it should be
-                "target": ""
+                target: ""
             };
             quests[IDS.networkProviderPart1].conditions.AvailableForStart = [condition];
         }
@@ -90,7 +90,7 @@ class Mod implements IPostDBLoadMod {
 
             if (CONFIG.gunsmithChallenge.killsRequired > 0 && quest.QuestName?.startsWith("Gunsmith")) {
                 quest.conditions.AvailableForFinish.filter((cond) => {
-                    return cond.conditionType === "WeaponAssembly";
+                    return cond.conditionType === QuestTypeEnum.WEAPON_ASSEMBLY;
                 }).map((weaponCondition) => {
                     const localeKey = `${quest._id} ${weaponCondition.id} challengeElims`;
 
