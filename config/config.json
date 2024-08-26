@@ -3,6 +3,7 @@
     "removeTimeGates": false,
     "addMissingSetupShotguns": false,
     "lightkeeperOnlyRequireLevel": 0,
+    "collectorOnlyRequireLevel": 0,
     "gunsmithChallenge": {
         "killsRequired": 0,
         "targetType": "pmc"

@@ -13,10 +13,27 @@ import { CONFIG, gunsmithChallengeTargetTypes } from "./config";
 export const IDS = {
     setupQuest: "5c1234c286f77406fa13baeb",
     networkProviderPart1: "625d6ff5ddc94657c21a1625",
+    collectorQuest: "5c51aac186f77432ea65c552",
 };
 
 
 class Mod implements IPostDBLoadMod {
+    protected getLevelCondition(conditionId: string, level: number): IQuestCondition {
+        return {
+            id: conditionId,
+            conditionType: "Level",
+            compareMethod: ">=",
+            value: level,
+            dynamicLocale: false,
+            globalQuestCounterId: "",
+            index: 0,
+            parentId: "",
+            visibilityConditions: [],
+            // `target` is not optional, but it should be
+            target: ""
+        };
+    }
+
     public postDBLoad(container: DependencyContainer): void {
         const logger = container.resolve<ILogger>("WinstonLogger");
         const log = (msg: string) => logger.info(`[QuestTweaks] ${msg}`);
@@ -45,23 +62,20 @@ class Mod implements IPostDBLoadMod {
             setupShotguns.push(Weapons.SHOTGUN_12G_SAWED_OFF);
         }
 
-        if (CONFIG.lightkeeperOnlyRequireLevel) {
-            const level = CONFIG.lightkeeperOnlyRequireLevel;
-            log(`Removing Network Provider prerequisites, player must be at least level ${level}.`);
-            const condition: IQuestCondition = {
-                id: `${IDS.networkProviderPart1}_levelCond`,
-                conditionType: "Level",
-                compareMethod: ">=",
-                value: level,
-                dynamicLocale: false,
-                globalQuestCounterId: "",
-                index: 0,
-                parentId: "",
-                visibilityConditions: [],
-                // `target` is not optional, but it should be
-                target: ""
-            };
-            quests[IDS.networkProviderPart1].conditions.AvailableForStart = [condition];
+        const lightkeeperLevel = CONFIG.lightkeeperOnlyRequireLevel;
+        if (lightkeeperLevel) {
+            log(`Removing Network Provider prerequisites, player must be at least level ${lightkeeperLevel}.`);
+            quests[IDS.networkProviderPart1].conditions.AvailableForStart = [
+                this.getLevelCondition(`${IDS.networkProviderPart1}_levelCond`, lightkeeperLevel)
+            ];
+        }
+
+        const collectorLevel = CONFIG.collectorOnlyRequireLevel;
+        if (CONFIG.collectorOnlyRequireLevel) {
+            log(`Removing Collector prerequisites, player must be at least level ${collectorLevel}`);
+            quests[IDS.collectorQuest].conditions.AvailableForStart = [
+                this.getLevelCondition(`${IDS.collectorQuest}_levelCond`, collectorLevel)
+            ];
         }
 
         if (CONFIG.gunsmithChallenge.killsRequired > 0) {
