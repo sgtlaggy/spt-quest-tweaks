@@ -5,7 +5,7 @@ import { QuestTypeEnum } from "@spt/models/enums/QuestTypeEnum";
 import { Weapons } from "@spt/models/enums/Weapons";
 import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
-import { DatabaseServer } from "@spt/servers/DatabaseServer";
+import { DatabaseService } from "@spt/services/DatabaseService";
 
 import { CONFIG, gunsmithChallengeTargetTypes } from "./config";
 
@@ -38,9 +38,9 @@ class Mod implements IPostDBLoadMod {
         const logger = container.resolve<ILogger>("WinstonLogger");
         const log = (msg: string) => logger.info(`[QuestTweaks] ${msg}`);
 
-        const db = container.resolve<DatabaseServer>("DatabaseServer").getTables();
-        const locales = db.locales.global;
-        const quests = db.templates.quests;
+        const db = container.resolve<DatabaseService>("DatabaseService");
+        const locales = db.getLocales().global;
+        const quests = db.getQuests();
 
         const [scavType, target, targetSingular, targetPluralSuffix] = gunsmithChallengeTargetTypes[CONFIG.gunsmithChallenge.targetType.toLowerCase()] || [undefined, undefined, undefined, undefined];
         const targetName = `${targetSingular}${CONFIG.gunsmithChallenge.killsRequired > 1 ? targetPluralSuffix : ""}`;
