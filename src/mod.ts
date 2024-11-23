@@ -28,9 +28,7 @@ class Mod implements IPostDBLoadMod {
             globalQuestCounterId: "",
             index: 0,
             parentId: "",
-            visibilityConditions: [],
-            // `target` is not optional, but it should be
-            target: ""
+            visibilityConditions: []
         };
     }
 
