@@ -62,8 +62,10 @@ class Mod implements IPostDBLoadMod {
         const lightkeeperLevel = CONFIG.lightkeeperOnlyRequireLevel;
         if (lightkeeperLevel) {
             log(`Removing Network Provider prerequisites, player must be at least level ${lightkeeperLevel}.`);
-            quests[IDS.networkProviderPart1].conditions.AvailableForStart = [
-                this.getLevelCondition(`${IDS.networkProviderPart1}_levelCond`, lightkeeperLevel)
+            const conditions = quests[IDS.networkProviderPart1].conditions;
+            const conditionId = conditions.AvailableForStart[0].id;
+            conditions.AvailableForStart = [
+                this.getLevelCondition(conditionId, lightkeeperLevel)
             ];
         }
 
