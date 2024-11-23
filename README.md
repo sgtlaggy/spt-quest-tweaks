@@ -20,9 +20,6 @@ Rant: The MP-18 is classified as a shotgun in-game due to Russian law classifyin
 
 This option will remove all the prerequisite quests to start `Network Provider - Part 1` and will only require a specific level. A value of `0` will disable this feature and leave the prerequisites in place.
 
-## Only Require Level to start Collector
-This option will remove all prerequisite quests to start `Collector` and only require a specific level. A value of 0 will disable this and leave prerequisites in place.
-
 ## Gunsmith Challenge
 
 Inspired by [SheefGG](https://www.twitch.tv/SheefGG)'s hardcore gunsmith challenge.

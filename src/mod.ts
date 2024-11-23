@@ -13,7 +13,6 @@ import { CONFIG, gunsmithChallengeTargetTypes } from "./config";
 export const IDS = {
     setupQuest: "5c1234c286f77406fa13baeb",
     networkProviderPart1: "625d6ff5ddc94657c21a1625",
-    collectorQuest: "5c51aac186f77432ea65c552",
 };
 
 
@@ -65,14 +64,6 @@ class Mod implements IPostDBLoadMod {
             log(`Removing Network Provider prerequisites, player must be at least level ${lightkeeperLevel}.`);
             quests[IDS.networkProviderPart1].conditions.AvailableForStart = [
                 this.getLevelCondition(`${IDS.networkProviderPart1}_levelCond`, lightkeeperLevel)
-            ];
-        }
-
-        const collectorLevel = CONFIG.collectorOnlyRequireLevel;
-        if (CONFIG.collectorOnlyRequireLevel) {
-            log(`Removing Collector prerequisites, player must be at least level ${collectorLevel}`);
-            quests[IDS.collectorQuest].conditions.AvailableForStart = [
-                this.getLevelCondition(`${IDS.collectorQuest}_levelCond`, collectorLevel)
             ];
         }
 
