@@ -41,8 +41,12 @@ class Mod implements IPostDBLoadMod {
             log("Revealing hidden/conditional objectives.");
         }
 
+        if (CONFIG.revealUnknownRewards) {
+            log("Revealing unknown rewards.");
+        }
+
         if (CONFIG.removeTimeGates) {
-            log("Removing time gates from all quests.")
+            log("Removing time gates from all quests.");
         }
 
         if (CONFIG.addMissingSetupShotguns) {
@@ -68,6 +72,12 @@ class Mod implements IPostDBLoadMod {
             if (CONFIG.revealAllQuestObjectives) {
                 for (const objective of quest.conditions.AvailableForFinish) {
                     objective.visibilityConditions = [];
+                }
+            }
+
+            if (CONFIG.revealUnknownRewards) {
+                for (const reward of quest.rewards.Success) {
+                    reward.unknown = false;
                 }
             }
 

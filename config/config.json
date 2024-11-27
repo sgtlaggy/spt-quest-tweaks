@@ -1,5 +1,6 @@
 {
     "revealAllQuestObjectives": false,
+    "revealUnknownRewards": false,
     "removeTimeGates": false,
     "addMissingSetupShotguns": false,
     "lightkeeperOnlyRequireLevel": 0
