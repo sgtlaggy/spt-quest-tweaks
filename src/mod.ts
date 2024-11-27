@@ -1,13 +1,12 @@
 import { DependencyContainer } from "tsyringe";
 
 import { IQuestCondition } from "@spt/models/eft/common/tables/IQuest";
-import { QuestTypeEnum } from "@spt/models/enums/QuestTypeEnum";
 import { Weapons } from "@spt/models/enums/Weapons";
 import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
 import { DatabaseService } from "@spt/services/DatabaseService";
 
-import { CONFIG } from "./config";
+import CONFIG from "../config/config.json";
 
 
 export const IDS = {
