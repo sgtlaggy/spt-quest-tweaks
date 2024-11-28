@@ -2,9 +2,13 @@
 
 ## Reveal All Quest Objectives
 
-This mod will reveal all objectives that are hidden by default and only show up after completing other objectives.
+Reveal all objectives that are hidden by default and only show up after completing other objectives.
 
 One example is Broadcast - Part 1, the objective to place the Signal Jammer doesn't appear until you've entered the room.
+
+## Reveal Unknown Quest Rewards
+
+Replace all "Unknown Reward" quest rewards with the actual items.
 
 ## Remove Time Gates
 
