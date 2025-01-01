@@ -2,6 +2,19 @@
     "revealAllQuestObjectives": false,
     "revealUnknownRewards": false,
     "removeTimeGates": false,
+
+    "removeConditions": {
+        "target": false,
+        "weapon": false,
+        "selfGear": false,
+        "enemyGear": false,
+        "selfHealthEffect": false,
+        "enemyHealthEffect": false,
+        "map": false,
+        "zone": false,
+        "findInRaid": false
+    },
+
     "addMissingSetupShotguns": false,
     "lightkeeperOnlyRequireLevel": 0
 }
