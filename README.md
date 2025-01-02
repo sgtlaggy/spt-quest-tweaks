@@ -14,6 +14,19 @@ Replace all "Unknown Reward" quest rewards with the actual items.
 
 Remove waiting periods after some quests like Gunsmith.
 
+## Remove Tedious Conditions
+
+The following objective conditions can be removed:
+
+- Elimination target (PMC, scav, boss, etc)
+- Weapon and mods
+- Equipment
+- Health/status effects (stun, dehydration)
+- Map/location
+- Zone
+  - Removing zone but not map conditions will expand it to the map.
+- Item found-in-raid status
+
 ## Add Missing Setup Shotguns
 
 The Setup quest requires an MP-series shotgun but this does not include the MP-43 sawed-off double barrel or MP-18 by default.
