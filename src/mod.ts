@@ -81,23 +81,23 @@ class Mod implements IPostDBLoadMod {
         }
 
         if (CONFIG.removeConditions.bodyPart) {
-            log("Removing body parts from elimniation requirement.")
+            log("Removing body part elimniation requirement.")
         }
 
         if (CONFIG.removeConditions.distance) {
-            log("Removing distance from elimniation requirement.")
+            log("Removing distance elimniation requirement.")
         }
 
         if (CONFIG.removeConditions.time) {
             log("Removing time from elimniation requirement.")
         }
 
-        if (CONFIG.removeConditions.zone) {
-            log("Removing specific areas from elimination requirements.");
-        }
-
-        if (CONFIG.removeConditions.map) {
-            log("Removing map restrictions from objective requirements.");
+        if (CONFIG.removeConditions.zone && CONFIG.removeConditions.map) {
+            log("Removing zone and map elimination requirements.");
+        } else if (CONFIG.removeConditions.zone) {
+            log("Replacing zone elimination requirements with location.");
+        } else if (CONFIG.removeConditions.map) {
+            log("Removing map objective requirements.");
         }
 
         if (CONFIG.removeConditions.findInRaid) {
