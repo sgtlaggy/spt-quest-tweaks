@@ -22,6 +22,9 @@ The following objective conditions can be removed:
 - Weapon and mods
 - Equipment
 - Health/status effects (stun, dehydration)
+- Body parts
+- Distance
+- Time
 - Map/location
 - Zone
   - Removing zone but not map conditions will expand it to the map.

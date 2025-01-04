@@ -80,6 +80,18 @@ class Mod implements IPostDBLoadMod {
             log("Removing enemy status effects from elimination requirements.");
         }
 
+        if (CONFIG.removeConditions.bodyPart) {
+            log("Removing body parts from elimniation requirement.")
+        }
+
+        if (CONFIG.removeConditions.distance) {
+            log("Removing distance from elimniation requirement.")
+        }
+
+        if (CONFIG.removeConditions.time) {
+            log("Removing time from elimniation requirement.")
+        }
+
         if (CONFIG.removeConditions.zone) {
             log("Removing specific areas from elimination requirements.");
         }
@@ -190,7 +202,8 @@ class Mod implements IPostDBLoadMod {
                         continue;
                     }
 
-                    const killCond = conditions.find((cond) => cond.conditionType === "Kills");
+                    const killCond = conditions.find((cond) =>
+                        ["Shots", "Kills"].includes(cond.conditionType));
                     if (!killCond) {
                         continue;
                     }
@@ -214,6 +227,24 @@ class Mod implements IPostDBLoadMod {
                     if (remove.enemyGear) {
                         killCond.enemyEquipmentExclusive = [];
                         killCond.enemyEquipmentInclusive = [];
+                    }
+
+                    if (remove.bodyPart) {
+                        killCond.bodyPart = [];
+                    }
+
+                    if (remove.distance) {
+                        killCond.distance = {
+                            compareMethod: ">=",
+                            value: 0
+                        }
+                    }
+
+                    if (remove.time) {
+                        killCond.daytime = {
+                            from: 0,
+                            to: 0
+                        }
                     }
                 }
             }

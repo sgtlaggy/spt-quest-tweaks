@@ -10,6 +10,9 @@
         "enemyGear": false,
         "selfHealthEffect": false,
         "enemyHealthEffect": false,
+        "bodyPart": false,
+        "distance": false,
+        "time": false,
         "map": false,
         "zone": false,
         "findInRaid": false
