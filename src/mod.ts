@@ -11,7 +11,6 @@ import CONFIG from "../config/config.json";
 
 
 export const IDS = {
-    setupQuest: "5c1234c286f77406fa13baeb",
     networkProviderPart1: "625d6ff5ddc94657c21a1625",
 };
 
@@ -102,15 +101,6 @@ class Mod implements IPostDBLoadMod {
 
         if (CONFIG.removeConditions.findInRaid) {
             log("Removing found in raid requirement for item hand-ins.");
-        }
-
-        if (CONFIG.addMissingSetupShotguns) {
-            log("Making the MP-18 & MP-43 sawed off valid for Setup.");
-            const setupShotguns = quests[IDS.setupQuest].conditions
-                .AvailableForFinish[0].counter.conditions
-                .find((cond) => cond.conditionType === "Kills").weapon;
-            setupShotguns.push(Weapons.SHOTGUN_762X54R_MP_18);
-            setupShotguns.push(Weapons.SHOTGUN_12G_SAWED_OFF);
         }
 
         const lightkeeperLevel = CONFIG.lightkeeperOnlyRequireLevel;
