@@ -18,5 +18,6 @@
         "findInRaid": false
     },
 
-    "lightkeeperOnlyRequireLevel": 0
+    "lightkeeperOnlyRequireLevel": 0,
+    "claustrophobiaAA12": false
 }

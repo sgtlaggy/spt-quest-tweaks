@@ -33,3 +33,6 @@ The following objective conditions can be removed:
 ## Only Require Level to start Lightkeeper
 
 This option will remove all the prerequisite quests to start `Network Provider - Part 1` and will only require a specific level. A value of `0` will disable this feature and leave the prerequisites in place.
+
+## Add AA12 to Claustrophobia
+Claustrophobia, like Setup in earlier versions, is missing the AA12 (both Gen 1 and Gen 2) from the list of shotguns you can use to kill in the Factory cellars.
