@@ -19,5 +19,6 @@
     },
 
     "lightkeeperOnlyRequireLevel": 0,
-    "claustrophobiaAA12": false
+    "claustrophobiaAA12": false,
+    "grenadierLaunchers": false
 }

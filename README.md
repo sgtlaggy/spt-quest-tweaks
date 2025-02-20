@@ -36,3 +36,6 @@ This option will remove all the prerequisite quests to start `Network Provider -
 
 ## Add AA12 to Claustrophobia
 Claustrophobia, like Setup in earlier versions, is missing the AA12 (both Gen 1 and Gen 2) from the list of shotguns you can use to kill in the Factory cellars.
+
+## Add Grenade Launchers to Grenadier
+Grenadier’s weapon list includes several unimplemented launchers, but none that are functional. This will make the FN40GL, MSGL, GP-25, and M203 kills count toward it.

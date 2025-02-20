@@ -2,6 +2,7 @@ import { DependencyContainer } from "tsyringe";
 
 import { ILocation } from "@spt/models/eft/common/ILocation";
 import { IQuestCondition } from "@spt/models/eft/common/tables/IQuest";
+import { ItemTpl } from "@spt/models/enums/ItemTpl";
 import { Weapons } from "@spt/models/enums/Weapons";
 import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
@@ -12,7 +13,8 @@ import CONFIG from "../config/config.json";
 
 export const IDS = {
     networkProviderPart1: "625d6ff5ddc94657c21a1625",
-    claustrophobia: "669fa3979b0ce3feae01a130"
+    claustrophobia: "669fa3979b0ce3feae01a130",
+    grenadier: "5c0d190cd09282029f5390d8",
 };
 
 
@@ -120,6 +122,17 @@ class Mod implements IPostDBLoadMod {
             conditions.AvailableForFinish[0].counter.conditions[0].weapon.push(
                 Weapons.SHOTGUN_12G_AA_12_GEN_1,
                 Weapons.SHOTGUN_12G_AA_12_GEN_2
+            );
+        }
+
+        if (CONFIG.grenadierLaunchers) {
+            log('Adding FN40, MSGL, GP-25, and M203 to Grenadier weapons.');
+            const conditions = quests[IDS.grenadier].conditions;
+            conditions.AvailableForFinish[0].counter.conditions[0].weapon.push(
+                Weapons.GRENADELAUNCHER_40X46_FN40GL,
+                Weapons.REVOLVER_40X46_MSGL,
+                ItemTpl.LAUNCHER_GP25_KOSTYOR_40MM_UNDERBARREL_GRENADE,
+                ItemTpl.LAUNCHER_M203_40MM_UNDERBARREL_GRENADE
             );
         }
 
