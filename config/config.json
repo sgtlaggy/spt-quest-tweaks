@@ -6,6 +6,7 @@
     "removeConditions": {
         "target": false,
         "weapon": false,
+        "weaponMods": false,
         "selfGear": false,
         "enemyGear": false,
         "selfHealthEffect": false,

@@ -63,7 +63,11 @@ class Mod implements IPostDBLoadMod {
         }
 
         if (CONFIG.removeConditions.weapon) {
-            log("Removing weapon/mod/caliber restrictions from elimination requirements.");
+            log("Removing weapon/caliber restrictions from elimination requirements.");
+        }
+
+        if (CONFIG.removeConditions.weaponMods) {
+            log("Removing weapon mod restrictions from elimination requirements.");
         }
 
         if (CONFIG.removeConditions.selfGear) {
@@ -229,6 +233,9 @@ class Mod implements IPostDBLoadMod {
                     if (remove.weapon) {
                         killCond.weapon = [];
                         killCond.weaponCaliber = [];
+                    }
+
+                    if (remove.weaponMods) {
                         killCond.weaponModsExclusive = [];
                         killCond.weaponModsInclusive = [];
                     }
