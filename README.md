@@ -39,3 +39,6 @@ Claustrophobia, like Setup in earlier versions, is missing the AA12 (both Gen 1 
 
 ## Add Grenade Launchers to Grenadier
 Grenadier’s weapon list includes several unimplemented launchers, but none that are functional. This will make the FN40GL, MSGL, GP-25, and M203 kills count toward it.
+
+## Add Sako TRG M10 to Tarkov Shooter 1-6
+BSG only added it to 7 and 8, this option makes it work for 1-6 as well.

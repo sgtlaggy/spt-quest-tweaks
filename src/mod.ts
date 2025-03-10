@@ -15,6 +15,14 @@ export const IDS = {
     networkProviderPart1: "625d6ff5ddc94657c21a1625",
     claustrophobia: "669fa3979b0ce3feae01a130",
     grenadier: "5c0d190cd09282029f5390d8",
+    tarkovShooter: [
+        "5bc4776586f774512d07cf05",
+        "5bc479e586f7747f376c7da3",
+        "5bc47dbf86f7741ee74e93b9",
+        "5bc480a686f7741af0342e29",
+        "5bc4826c86f774106d22d88b",
+        "5bc4836986f7740c0152911c",
+    ],
 };
 
 
@@ -138,6 +146,21 @@ class Mod implements IPostDBLoadMod {
                 ItemTpl.LAUNCHER_GP25_KOSTYOR_40MM_UNDERBARREL_GRENADE,
                 ItemTpl.LAUNCHER_M203_40MM_UNDERBARREL_GRENADE
             );
+        }
+
+        if (CONFIG.tarkovShooterM10) {
+            log('Adding Sako TRG M10 to Tarkov Shooter 1-6 weapons.');
+            for (const questId of IDS.tarkovShooter) {
+                for (const objective of quests[questId].conditions.AvailableForFinish) {
+                    if (objective.conditionType === "CounterCreator") {
+                        for (const cond of objective.counter.conditions) {
+                            if (cond.conditionType === "Kills") {
+                                cond.weapon.push(Weapons.SNIPERRIFLE_86X70_TRG_M10);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         for (const quest of Object.values(quests)) {
