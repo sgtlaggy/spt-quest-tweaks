@@ -1,7 +1,7 @@
 {
     "name": "QuestTweaks",
-    "version": "3.5.0",
-    "sptVersion": "^3.10",
+    "version": "4.0.0",
+    "sptVersion": "~3.11",
     "author": "sgtlaggy",
     "contributors": [],
     "license": "MIT",
@@ -16,7 +16,7 @@
         "buildinfo": "node ./build.mjs --verbose"
     },
     "devDependencies": {
-        "@types/node": "20.11",
+        "@types/node": "22.12",
         "@typescript-eslint/eslint-plugin": "7.2",
         "@typescript-eslint/parser": "7.2",
         "archiver": "^6.0",
