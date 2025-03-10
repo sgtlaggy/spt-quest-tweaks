@@ -13,7 +13,6 @@ import CONFIG from "../config/config.json";
 
 export const IDS = {
     networkProviderPart1: "625d6ff5ddc94657c21a1625",
-    claustrophobia: "669fa3979b0ce3feae01a130",
     grenadier: "5c0d190cd09282029f5390d8",
     tarkovShooter: [
         "5bc4776586f774512d07cf05",
@@ -126,15 +125,6 @@ class Mod implements IPostDBLoadMod {
             conditions.AvailableForStart = [
                 this.getLevelCondition(conditionId, lightkeeperLevel)
             ];
-        }
-
-        if (CONFIG.claustrophobiaAA12) {
-            log('Adding AA12 to shotguns allowed for Claustrophobia.');
-            const conditions = quests[IDS.claustrophobia].conditions;
-            conditions.AvailableForFinish[0].counter.conditions[0].weapon.push(
-                Weapons.SHOTGUN_12G_AA_12_GEN_1,
-                Weapons.SHOTGUN_12G_AA_12_GEN_2
-            );
         }
 
         if (CONFIG.grenadierLaunchers) {
