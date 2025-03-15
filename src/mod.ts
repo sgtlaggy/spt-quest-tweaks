@@ -13,7 +13,6 @@ import CONFIG from "../config/config.json";
 
 export const IDS = {
     networkProviderPart1: "625d6ff5ddc94657c21a1625",
-    grenadier: "5c0d190cd09282029f5390d8",
     tarkovShooter: [
         "5bc4776586f774512d07cf05",
         "5bc479e586f7747f376c7da3",
@@ -125,17 +124,6 @@ class Mod implements IPostDBLoadMod {
             conditions.AvailableForStart = [
                 this.getLevelCondition(conditionId, lightkeeperLevel)
             ];
-        }
-
-        if (CONFIG.grenadierLaunchers) {
-            log('Adding FN40, MSGL, GP-25, and M203 to Grenadier weapons.');
-            const conditions = quests[IDS.grenadier].conditions;
-            conditions.AvailableForFinish[0].counter.conditions[0].weapon.push(
-                Weapons.GRENADELAUNCHER_40X46_FN40GL,
-                Weapons.REVOLVER_40X46_MSGL,
-                ItemTpl.LAUNCHER_GP25_KOSTYOR_40MM_UNDERBARREL_GRENADE,
-                ItemTpl.LAUNCHER_M203_40MM_UNDERBARREL_GRENADE
-            );
         }
 
         if (CONFIG.tarkovShooterM10) {
