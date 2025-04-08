@@ -1,0 +1,14 @@
+{
+    "name": "sgtlaggy's Quest Tweaks",
+    "author": "sgtlaggy",
+    "contributors": [],
+    "version": "4.0.1",
+    "sptVersion": "4.0.0",
+    "loadBefore": [],
+    "loadAfter": [],
+    "incompatibilities": [],
+    "modDependencies": {},
+    "url": "https://github.com/sgtlaggy/spt-quest-tweaks",
+    "isBundleMod": false,
+    "licence": "MIT"
+}

@@ -1,0 +1,24 @@
+{
+    "revealAllQuestObjectives": false,
+    "revealUnknownRewards": false,
+    "removeTimeGates": false,
+
+    "removeConditions": {
+        "target": false,
+        "weapon": false,
+        "weaponMods": false,
+        "selfGear": false,
+        "enemyGear": false,
+        "selfHealthEffect": false,
+        "enemyHealthEffect": false,
+        "bodyPart": false,
+        "distance": false,
+        "time": false,
+        "map": false,
+        "zone": false,
+        "findInRaid": false
+    },
+
+    "lightkeeperOnlyRequireLevel": 0,
+    "tarkovShooterM10": false
+}
