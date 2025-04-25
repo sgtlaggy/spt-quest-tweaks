@@ -164,102 +164,114 @@ class Mod implements IPostDBLoadMod {
                 }
             }
 
-            if (shouldRemoveSomeConditions) {
-                const remove = CONFIG.removeConditions;
+            if (!shouldRemoveSomeConditions) {
+                continue;
+            }
 
-                for (const objective of objectives) {
-                    if (remove.findInRaid
-                        && (objective.conditionType === "HandoverItem"
-                            || objective.conditionType === "FindItem")) {
-                        objective.onlyFoundInRaid = false;
-                    }
+            const remove = CONFIG.removeConditions;
 
-                    if (objective.conditionType !== "CounterCreator") {
-                        continue;
-                    }
+            for (const objective of objectives) {
+                if (remove.findInRaid
+                    && (objective.conditionType === "HandoverItem"
+                        || objective.conditionType === "FindItem")) {
+                    objective.onlyFoundInRaid = false;
+                }
 
-                    // convert any zone conditions to map conditions
-                    // checks both quest location and objective text to get map
-                    if (remove.zone && !remove.map) {
-                        const zoneCond = objective.counter.conditions.find(
-                            (cond) => cond.conditionType === "InZone");
+                if (objective.conditionType !== "CounterCreator") {
+                    continue;
+                }
 
-                        if (zoneCond) {
-                            for (const [name, id, mongoId] of locations) {
-                                if (quest.location === mongoId || enLocale[objective.id].includes(name)) {
-                                    // @ts-ignore   zoneIds is missing from interface
-                                    delete zoneCond.zoneIds;
-                                    zoneCond.conditionType = "Location";
-                                    zoneCond.target = [id];
-                                    break;
-                                }
+                // convert any zone conditions to map conditions
+                // checks both quest location and objective text to get map
+                if (remove.zone && !remove.map) {
+                    const zoneCond = objective.counter.conditions.find(
+                        (cond) => cond.conditionType === "InZone");
+
+                    if (zoneCond) {
+                        for (const [name, id, mongoId] of locations) {
+                            if (quest.location === mongoId || enLocale[objective.id].includes(name)) {
+                                // @ts-ignore   zoneIds is missing from interface
+                                delete zoneCond.zoneIds;
+                                zoneCond.conditionType = "Location";
+                                zoneCond.target = [id];
+                                break;
                             }
                         }
                     }
+                }
 
-                    // removing any straggler InZone requirements that
-                    // couldn't be converted to Location above
-                    let conditions = objective.counter.conditions.filter(
-                        (cond) => {
-                            return !((remove.selfHealthEffect && cond.conditionType === "HealthEffect")
-                                || (remove.selfGear && cond.conditionType === "Equipment")
-                                || (remove.map && cond.conditionType === "Location")
-                                || (remove.zone && cond.conditionType === "InZone"));
-                        }
-                    );
-
-                    objective.counter.conditions = conditions;
-
-                    // make the objective instantly complete if it has no "action"
-                    // conditions like kills dehydration for X time
-                    const onlyRestrictiveConditions = conditions.every((cond) =>
-                        ["Equipment", "Location", "InZone"].includes(cond.conditionType));
-
-                    if (onlyRestrictiveConditions) {
-                        objective.value = 0;
-                        continue;
+                // removing any straggler InZone requirements that
+                // couldn't be converted to Location above
+                let conditions = objective.counter.conditions.filter(
+                    (cond) => {
+                        return !((remove.selfHealthEffect && cond.conditionType === "HealthEffect")
+                            || (remove.selfGear && cond.conditionType === "Equipment")
+                            || (remove.map && cond.conditionType === "Location")
+                            || (remove.zone && cond.conditionType === "InZone"));
                     }
+                );
 
-                    const killCond = conditions.find((cond) =>
-                        ["Shots", "Kills"].includes(cond.conditionType));
-                    if (!killCond) {
-                        continue;
-                    }
+                objective.counter.conditions = conditions;
 
-                    if (remove.target) {
-                        killCond.savageRole = [];
-                        killCond.target = "Any";
-                    }
+                // make the objective instantly complete if it has no "action"
+                // conditions like kills dehydration for X time
+                const onlyRestrictiveConditions = conditions.every((cond) =>
+                    ["Equipment", "Location", "InZone"].includes(cond.conditionType));
 
-                    if (remove.weapon) {
-                        killCond.weapon = [];
-                        killCond.weaponCaliber = [];
-                    }
+                if (onlyRestrictiveConditions) {
+                    objective.value = 0;
+                    continue;
+                }
 
-                    if (remove.weaponMods) {
-                        killCond.weaponModsExclusive = [];
-                        killCond.weaponModsInclusive = [];
-                    }
+                const killCond = conditions.find((cond) =>
+                    ["Shots", "Kills"].includes(cond.conditionType));
+                if (!killCond) {
+                    continue;
+                }
 
-                    if (remove.enemyHealthEffect) {
-                        killCond.enemyHealthEffects = [];
-                    }
+                if (remove.target) {
+                    killCond.savageRole = [];
+                    killCond.target = "Any";
+                }
 
-                    if (remove.enemyGear) {
-                        killCond.enemyEquipmentExclusive = [];
-                        killCond.enemyEquipmentInclusive = [];
-                    }
+                if (remove.weapon) {
+                    killCond.weapon = [];
+                    killCond.weaponCaliber = [];
+                }
 
-                    if (remove.bodyPart) {
-                        killCond.bodyPart = [];
-                    }
+                if (remove.weaponMods) {
+                    killCond.weaponModsExclusive = [];
+                    killCond.weaponModsInclusive = [];
+                }
 
-                    if (remove.distance) {
-                        killCond.distance = {
-                            compareMethod: ">=",
-                            value: 0
-                        }
+                if (remove.enemyHealthEffect) {
+                    killCond.enemyHealthEffects = [];
+                }
+
+                if (remove.enemyGear) {
+                    killCond.enemyEquipmentExclusive = [];
+                    killCond.enemyEquipmentInclusive = [];
+                }
+
+                if (remove.bodyPart) {
+                    killCond.bodyPart = [];
+                }
+
+                if (remove.distance) {
+                    killCond.distance = {
+                        compareMethod: ">=",
+                        value: 0
                     }
+                }
+
+                if (remove.time) {
+                    killCond.daytime = {
+                        from: 0,
+                        to: 0
+                    }
+                }
+            }
+        }
 
                     if (remove.time) {
                         killCond.daytime = {
