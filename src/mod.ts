@@ -2,10 +2,12 @@ import { DependencyContainer } from "tsyringe";
 
 import { ILocation } from "@spt/models/eft/common/ILocation";
 import { IQuestCondition } from "@spt/models/eft/common/tables/IQuest";
-import { ItemTpl } from "@spt/models/enums/ItemTpl";
+import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
 import { Weapons } from "@spt/models/enums/Weapons";
 import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
+import { IQuestConfig } from "@spt/models/spt/config/IQuestConfig";
 import { ILogger } from "@spt/models/spt/utils/ILogger";
+import { ConfigServer } from "@spt/servers/ConfigServer";
 import { DatabaseService } from "@spt/services/DatabaseService";
 
 import CONFIG from "../config/config.json";
@@ -273,12 +275,57 @@ class Mod implements IPostDBLoadMod {
             }
         }
 
-                    if (remove.time) {
-                        killCond.daytime = {
-                            from: 0,
-                            to: 0
+        const configServer = container.resolve<ConfigServer>("ConfigServer");
+        const questConfig = configServer.getConfig<IQuestConfig>(ConfigTypes.QUEST);
+
+        if (!(shouldRemoveSomeConditions && CONFIG.affectRepeatables)) {
+            return;
+        }
+
+        const remove = CONFIG.removeConditions;
+        for (const quest of questConfig.repeatableQuests) {
+            if (remove.map) {
+                // @ts-ignore   ts-ls thinks this Record requires all enum values as keys
+                //              but quest generation handles this as a human would expect
+                quest.locations = { "any": ["any"] };
+
+                if (quest.questConfig.Exploration) {
+                    quest.questConfig.Exploration.specificExits.probability = 0;
+                }
+            }
+
+            if (remove.findInRaid && quest.questConfig.Completion) {
+                quest.questConfig.Completion.requiredItemsAreFiR = false;
+            }
+
+            const elims = quest.questConfig.Elimination;
+            if (!elims) {
+                continue;
+            }
+
+            for (const elim of elims) {
+                if (remove.target) {
+                    elim.targets = [{
+                        key: "Any",
+                        relativeProbability: 1,
+                        data: {
+                            isBoss: false,
+                            isPmc: false
                         }
-                    }
+                    }];
+                }
+
+                if (remove.weapon) {
+                    elim.weaponCategoryRequirementProb = 0;
+                    elim.weaponRequirementProb = 0;
+                }
+
+                if (remove.bodyPart) {
+                    elim.bodyPartProb = 0;
+                }
+
+                if (remove.distance) {
+                    elim.distProb = 0;
                 }
             }
         }
