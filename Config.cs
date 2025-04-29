@@ -17,6 +17,9 @@ public record Config
     [JsonPropertyName("removeConditions")]
     public ConditionsConfig RemoveConditions { get; set; }
 
+    [JsonPropertyName("affectRepeatables")]
+    public bool AffectRepeatables {get; set; }
+
     [JsonPropertyName("lightkeeperOnlyRequireLevel")]
     public int LightkeeperOnlyRequireLevel { get; set; }
 

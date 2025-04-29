@@ -18,6 +18,7 @@
         "zone": false,
         "findInRaid": false
     },
+    "affectRepeatables": true,
 
     "lightkeeperOnlyRequireLevel": 0,
     "tarkovShooterM10": false

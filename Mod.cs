@@ -3,7 +3,11 @@ using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 using SPTarkov.Server.Core.Models.External;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
+using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Models.Spt.Config;
+using SPTarkov.Server.Core.Models.Enums;
+using SPTarkov.Server.Core.Utils.Collections;
 using System.Reflection;
 using System.Text.Json;
 
@@ -34,6 +38,7 @@ public record LocationInfo
 public class Mod(
     ISptLogger<Mod> _logger,
     DatabaseService _db,
+    ConfigServer _configServer,
     JsonUtil _json
 ) : IPostDBLoadMod
 {
@@ -346,6 +351,71 @@ public class Mod(
                             To = 0
                         };
                     }
+                }
+            }
+        }
+
+        if (!(shouldRemoveConditions && _config.AffectRepeatables))
+        {
+            return;
+        }
+
+        var questConfig = _configServer.GetConfig<QuestConfig>();
+
+        foreach (var quest in questConfig.RepeatableQuests)
+        {
+            if (remove.Map)
+            {
+                quest.Locations = new Dictionary<ELocationName, List<string>>
+                {
+                    [ELocationName.any] = ["any"]
+                };
+
+                if (quest.QuestConfig.Exploration is not null)
+                {
+                    quest.QuestConfig.Exploration.SpecificExits.Probability = 0;
+                }
+            }
+
+            if (remove.FindInRaid && (quest.QuestConfig.Completion is not null))
+            {
+                quest.QuestConfig.Completion.RequiredItemsAreFiR = false;
+            }
+
+            var elims = quest.QuestConfig.Elimination;
+            if (elims is not null)
+            {
+                continue;
+            }
+
+            foreach (var elim in elims)
+            {
+                if (remove.Target)
+                {
+                    elim.Targets = [new ProbabilityObject<string, BossInfo> {
+                        Key = "Any",
+                        RelativeProbability = 1,
+                        Data = new BossInfo{
+                            IsBoss = false,
+                            IsPmc = false
+                        }
+                    }];
+                }
+
+                if (remove.Weapon)
+                {
+                    elim.WeaponCategoryRequirementProbability = 0;
+                    elim.WeaponRequirementProbability = 0;
+                }
+
+                if (remove.BodyPart)
+                {
+                    elim.BodyPartProbability = 0;
+                }
+
+                if (remove.Distance)
+                {
+                    elim.DistanceProbability = 0;
                 }
             }
         }
