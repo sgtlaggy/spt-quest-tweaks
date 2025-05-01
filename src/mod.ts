@@ -188,8 +188,11 @@ class Mod implements IPostDBLoadMod {
                 if (remove.zone && !remove.map) {
                     const zoneCond = objective.counter.conditions.find(
                         (cond) => cond.conditionType === "InZone");
+                    const mapCond = objective.counter.conditions.find(
+                        (cond) => cond.conditionType === "Location");
 
-                    if (zoneCond) {
+                    // only modify zone condition if a location condition isn’t present
+                    if (zoneCond && !mapCond) {
                         for (const [name, id, mongoId] of locations) {
                             if (quest.location === mongoId || enLocale[objective.id].includes(name)) {
                                 // @ts-ignore   zoneIds is missing from interface
