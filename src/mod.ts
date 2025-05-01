@@ -195,11 +195,16 @@ class Mod implements IPostDBLoadMod {
                     if (zoneCond && !mapCond) {
                         for (const [name, id, mongoId] of locations) {
                             if (quest.location === mongoId || enLocale[objective.id].includes(name)) {
-                                // @ts-ignore   zoneIds is missing from interface
-                                delete zoneCond.zoneIds;
-                                zoneCond.conditionType = "Location";
-                                zoneCond.target = [id];
-                                break;
+                                // cover map variants like Factory and Ground Zero
+                                if (zoneCond.conditionType === "Location") {
+                                    // @ts-ignore   this will always be an array
+                                    zoneCond.target.push(id);
+                                } else {
+                                    // @ts-ignore   zoneIds is missing from interface
+                                    delete zoneCond.zoneIds;
+                                    zoneCond.conditionType = "Location";
+                                    zoneCond.target = [id];
+                                }
                             }
                         }
                     }
