@@ -48,9 +48,18 @@ class Mod implements IPostDBLoadMod {
         const db = container.resolve<DatabaseService>("DatabaseService");
         const quests = db.getQuests();
         const enLocale = db.getLocales().global.en;
+
         const locations = Object.values(db.getLocations())
             .filter((loc) => loc.base?.Enabled)
-            .map((loc: ILocation) => [enLocale[loc.base.Id], loc.base.Id, loc.base._Id]);
+            .map((loc: ILocation) => [
+                // terminal/lab names are undefined using ‘.Id’, so they need ‘._Id’
+                enLocale[loc.base.Id] || enLocale[`${loc.base._Id} Name`],
+                loc.base.Id,
+                loc.base._Id
+            ]);
+        // special-case Factory night because it’s not enabled and name in locale is "Night Factory"
+        const factoryNight = db.getLocations().factory4_night.base;
+        locations.push(["Factory", factoryNight.Id, factoryNight._Id]);
 
         if (CONFIG.revealAllQuestObjectives) {
             log("Revealing hidden/conditional objectives.");
