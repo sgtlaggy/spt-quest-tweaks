@@ -19,6 +19,7 @@
         "findInRaid": false
     },
     "affectRepeatables": true,
+    "exemptQuests": [],
 
     "lightkeeperOnlyRequireLevel": 0,
     "tarkovShooterM10": false

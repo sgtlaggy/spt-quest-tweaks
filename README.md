@@ -30,6 +30,11 @@ The following objective conditions can be removed:
   - Removing zone but not map conditions will expand it to the map.
 - Item found-in-raid status
 
+An additional setting toggles whether these also apply to repeatable quests.
+
+The `exemptQuests` setting lets you specify a list of quests conditions will *not* be removed from. This should be a list of quest IDs, which can be found by searching the quest name in `SPT_Data/Server/database/locales/global/en.json` and looking for a matching line starting with `"<QUEST ID> name"`. For example, the ID of the dehydration quest "The Survivalist Path - Zhivchik" is `5d25bfd086f77442734d3007`. This can be added to the list like `["5d25bfd086f77442734d3007"]`. To add multiple quests, add a comma between ids like `["...", "..."]`.
+Modded quests can also be added. Their quest IDs can be found in some file in their own mod folder in `user/mods` or, if they use VCQL, `user/mods/Virtual's Custom Quest Loader/database/locales/en/THAT_TRADER.json`.
+
 ## Only Require Level to start Lightkeeper
 
 This option will remove all the prerequisite quests to start `Network Provider - Part 1` and will only require a specific level. A value of `0` will disable this feature and leave the prerequisites in place.

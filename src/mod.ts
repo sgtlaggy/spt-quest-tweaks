@@ -61,6 +61,8 @@ class Mod implements IPostDBLoadMod {
         const factoryNight = db.getLocations().factory4_night.base;
         locations.push(["Factory", factoryNight.Id, factoryNight._Id]);
 
+        const exemptQuests = new Set(CONFIG.exemptQuests);
+
         if (CONFIG.revealAllQuestObjectives) {
             log("Revealing hidden/conditional objectives.");
         }
@@ -173,6 +175,10 @@ class Mod implements IPostDBLoadMod {
                         prereq.availableAfter = 0;
                     }
                 }
+            }
+
+            if (exemptQuests.has(quest._id)) {
+                continue;
             }
 
             if (!shouldRemoveSomeConditions) {
