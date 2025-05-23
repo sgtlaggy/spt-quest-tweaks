@@ -2,7 +2,9 @@ import { DependencyContainer } from "tsyringe";
 
 import { ILocation } from "@spt/models/eft/common/ILocation";
 import { IQuestCondition } from "@spt/models/eft/common/tables/IQuest";
+import { BaseClasses } from "@spt/models/enums/BaseClasses";
 import { ConfigTypes } from "@spt/models/enums/ConfigTypes";
+import { ItemTpl } from "@spt/models/enums/ItemTpl";
 import { Weapons } from "@spt/models/enums/Weapons";
 import { IPostDBLoadMod } from "@spt/models/external/IPostDBLoadMod";
 import { IQuestConfig } from "@spt/models/spt/config/IQuestConfig";
@@ -25,6 +27,13 @@ export const IDS = {
     ],
 };
 
+const KEY_CLASSES: Set<string> = new Set([BaseClasses.KEY, BaseClasses.KEY_MECHANICAL, BaseClasses.KEYCARD]);
+const HANDOVER_COUNT_ITEM_BLACKLIST: Set<string> = new Set([
+    ItemTpl.RADIOTRANSMITTER_DIGITAL_SECURE_DSP_RADIO_TRANSMITTER,
+    ItemTpl.BARTER_KOSA_UAV_ELECTRONIC_JAMMING_DEVICE,
+    ItemTpl.INFO_NOTE_WITH_CODE_WORD_VORON,
+]);
+
 
 class Mod implements IPostDBLoadMod {
     protected getLevelCondition(conditionId: string, level: number): IQuestCondition {
@@ -46,6 +55,7 @@ class Mod implements IPostDBLoadMod {
         const log = (msg: string) => logger.info(`[QuestTweaks] ${msg}`);
 
         const db = container.resolve<DatabaseService>("DatabaseService");
+        const items = db.getItems();
         const quests = db.getQuests();
         const enLocale = db.getLocales().global.en;
 
@@ -75,7 +85,9 @@ class Mod implements IPostDBLoadMod {
             log("Removing time gates from all quests.");
         }
 
-        const shouldRemoveSomeConditions = Object.values(CONFIG.removeConditions).some((enabled) => enabled);
+        const shouldModifyConditions = Object.values(CONFIG.removeConditions).some((enabled) => enabled)
+            || CONFIG.handoverItemCount >= 0
+            || CONFIG.eliminationCount >= 0;
 
         if (CONFIG.removeConditions.target) {
             log("Removing target restrictions from elimination requirements.")
@@ -127,6 +139,14 @@ class Mod implements IPostDBLoadMod {
 
         if (CONFIG.removeConditions.findInRaid) {
             log("Removing found in raid requirement for item hand-ins.");
+        }
+
+        if (CONFIG.handoverItemCount >= 0) {
+            log(`Setting required number of items for hand-over to ${CONFIG.handoverItemCount}.`);
+        }
+
+        if (CONFIG.eliminationCount >= 0) {
+            log(`Setting required number of eliminations to ${CONFIG.eliminationCount}.`);
         }
 
         const lightkeeperLevel = CONFIG.lightkeeperOnlyRequireLevel;
@@ -181,17 +201,25 @@ class Mod implements IPostDBLoadMod {
                 continue;
             }
 
-            if (!shouldRemoveSomeConditions) {
+            if (!shouldModifyConditions) {
                 continue;
             }
 
             const remove = CONFIG.removeConditions;
 
             for (const objective of objectives) {
-                if (remove.findInRaid
-                    && (objective.conditionType === "HandoverItem"
-                        || objective.conditionType === "FindItem")) {
-                    objective.onlyFoundInRaid = false;
+                if ((objective.conditionType === "HandoverItem" || objective.conditionType === "FindItem")) {
+                    if (remove.findInRaid) {
+                        objective.onlyFoundInRaid = false;
+                    }
+
+                    const item = items[objective.target[0]];
+                    if (CONFIG.handoverItemCount >= 0
+                        && !item._props.QuestItem
+                        && !KEY_CLASSES.has(item._parent)
+                        && !HANDOVER_COUNT_ITEM_BLACKLIST.has(item._id)) {
+                        objective.value = CONFIG.handoverItemCount;
+                    }
                 }
 
                 if (objective.conditionType !== "CounterCreator") {
@@ -254,6 +282,10 @@ class Mod implements IPostDBLoadMod {
                     continue;
                 }
 
+                if ((CONFIG.eliminationCount >= 0) && (killCond.conditionType === "Kills")) {
+                    objective.value = CONFIG.eliminationCount;
+                }
+
                 if (remove.target) {
                     killCond.savageRole = [];
                     killCond.target = "Any";
@@ -301,7 +333,7 @@ class Mod implements IPostDBLoadMod {
         const configServer = container.resolve<ConfigServer>("ConfigServer");
         const questConfig = configServer.getConfig<IQuestConfig>(ConfigTypes.QUEST);
 
-        if (!(shouldRemoveSomeConditions && CONFIG.affectRepeatables)) {
+        if (!(shouldModifyConditions && CONFIG.affectRepeatables)) {
             return;
         }
 
