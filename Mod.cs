@@ -269,10 +269,17 @@ public class QuestTweaks(
                             if (quest.Location == loc.MongoId
                                 || enLocale[objective.Id].Contains(loc.Name))
                             {
-                                zoneCond.Zones = null;
-                                zoneCond.ConditionType = "Location";
-                                zoneCond.Target = new ListOrT<string>(null, loc.Id);
-                                break;
+                                if (zoneCond.ConditionType == "InZone")
+                                {
+                                    zoneCond.Zones = null;
+                                    zoneCond.ConditionType = "Location";
+                                    zoneCond.Target = new ListOrT<string>([loc.Id], default);
+                                }
+                                // already replaced, support Factory and Ground Zero variants
+                                else
+                                {
+                                    zoneCond.Target.List.Append(loc.Id);
+                                }
                             }
                         }
                     }
@@ -305,7 +312,7 @@ public class QuestTweaks(
                     if (remove.Target)
                     {
                         cond.SavageRole.Clear();
-                        cond.Target = new ListOrT<string>(null, "Any");
+                        cond.Target = new ListOrT<string>(default, "Any");
                     }
 
                     if (remove.Weapon)
