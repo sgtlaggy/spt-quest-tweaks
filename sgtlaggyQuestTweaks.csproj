@@ -19,7 +19,7 @@
 
   <Target Name="Zip" AfterTargets="AfterBuild">
     <Copy
-        SourceFiles="package.json;config.json;$(OutputPath)\$(MSBuildProjectName).dll"
+        SourceFiles="$(TargetPath);config.json"
         DestinationFolder="$(ModDir)"/>
     <ZipDirectory
         SourceDirectory="$(DirToZip)"
@@ -28,7 +28,7 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease4" />
+    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease9" />
   </ItemGroup>
 
 </Project>

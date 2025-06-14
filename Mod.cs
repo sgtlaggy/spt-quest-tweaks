@@ -1,15 +1,17 @@
-﻿using SPTarkov.Common.Annotations;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Utils;
-using SPTarkov.Server.Core.Models.External;
+﻿using System.Reflection;
+using System.Text.Json;
+using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
+using SPTarkov.Server.Core.Models.Enums;
+using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Server.Core.Models.Spt.Mod;
+using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
-using SPTarkov.Server.Core.Models.Spt.Config;
-using SPTarkov.Server.Core.Models.Enums;
+using SPTarkov.Server.Core.Utils;
 using SPTarkov.Server.Core.Utils.Collections;
-using System.Reflection;
-using System.Text.Json;
+using SPTarkov.Server.Core.Utils.Json;
 
 
 namespace sgtlaggyQuestTweaks;
@@ -34,18 +36,18 @@ public record LocationInfo
     public string MongoId;
 }
 
-[Injectable]
-public class Mod(
-    ISptLogger<Mod> _logger,
+[Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 1)]
+public class QuestTweaks(
+    ISptLogger<QuestTweaks> _logger,
     DatabaseService _db,
     ConfigServer _configServer,
     JsonUtil _json
-) : IPostDBLoadMod
+) : IOnLoad
 {
     protected Config _config;
     protected string _modDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-    public void PostDBLoad()
+    public Task OnLoad()
     {
         try
         {
@@ -54,7 +56,7 @@ public class Mod(
         catch (JsonException)
         {
             _logger.Error("Invalid config.");
-            return;
+            return Task.CompletedTask;
         }
 
         var quests = _db.GetQuests();
@@ -269,7 +271,7 @@ public class Mod(
                             {
                                 cond.Zones = null;
                                 cond.ConditionType = "Location";
-                                cond.Target = loc.Id;
+                                cond.Target = new ListOrT<string>(null, loc.Id);
                                 break;
                             }
                         }
@@ -303,7 +305,7 @@ public class Mod(
                     if (remove.Target)
                     {
                         cond.SavageRole.Clear();
-                        cond.Target = "Any"; // TODO: verify type
+                        cond.Target = new ListOrT<string>(null, "Any");
                     }
 
                     if (remove.Weapon)
@@ -357,7 +359,7 @@ public class Mod(
 
         if (!(shouldRemoveConditions && _config.AffectRepeatables))
         {
-            return;
+            return Task.CompletedTask;
         }
 
         var questConfig = _configServer.GetConfig<QuestConfig>();
@@ -419,5 +421,22 @@ public class Mod(
                 }
             }
         }
+        return Task.CompletedTask;
     }
+}
+
+public record ModMetadata : AbstractModMetadata
+{
+    public override string Name { get; set; } = "sgtlaggy's Quest Tweaks";
+    public override string Author { get; set; } = "sgtlaggy";
+    public override string Version { get; set; } = Assembly.GetExecutingAssembly().GetName().Version.ToString();
+    public override string Url { get; set; } = "https://github.com/sgtlaggy/spt-quest-tweaks";
+    public override string Licence { get; set; } = "MIT";
+    public override string SptVersion { get; set; } = "~4.0.0";
+    public override List<string> Contributors { get; set; }
+    public override List<string> LoadBefore { get; set; }
+    public override List<string> LoadAfter { get; set; }
+    public override List<string> Incompatibilities { get; set; }
+    public override Dictionary<string, string> ModDependencies { get; set; }
+    public override bool? IsBundleMod { get; set; }
 }
