@@ -61,16 +61,26 @@ public class QuestTweaks(
 
         var quests = _db.GetQuests();
         var enLocale = _db.GetLocales().Global["en"].Value;
+
         var locations = _db.GetLocations().GetDictionary().Values
             .Where(loc => loc.Base?.Enabled ?? false)
             .Select(
-                (loc, index) => new LocationInfo
+                (loc) => new LocationInfo
                 {
-                    Name = enLocale[loc.Base.Id],
+                    // Terminal/Lab are undefined using ‘.Id’, need to get "proper" name
+                    Name = enLocale[loc.Base.Id] ?? enLocale[$"{loc.Base.IdField} Name"],
                     Id = loc.Base.Id,
                     MongoId = loc.Base.IdField
                 }
             );
+        // special-case factory night because it’s not enabled and name in locale is "Night Factory"
+        var factoryNight = _db.GetLocation(ELocationName.factory4_night.ToString()).Base;
+        locations.Append(new LocationInfo
+        {
+            Name = "Factory",
+            Id = factoryNight.Id,
+            MongoId = factoryNight.IdField
+        });
 
         if (_config.RevealAllQuestObjectives)
         {
