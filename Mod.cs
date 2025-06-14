@@ -257,21 +257,21 @@ public class QuestTweaks(
 
                 if (remove.Zone && !remove.Map)
                 {
-                    foreach (var cond in objective.Counter.Conditions)
-                    {
-                        if (cond.ConditionType != "InZone")
-                        {
-                            continue;
-                        }
+                    var zoneCond = objective.Counter.Conditions.Find(
+                        cond => cond.ConditionType == "InZone");
+                    var mapCond = objective.Counter.Conditions.Find(
+                        cond => cond.ConditionType == "Location");
 
+                    if ((zoneCond is not null) && (mapCond is null))
+                    {
                         foreach (var loc in locations)
                         {
                             if (quest.Location == loc.MongoId
                                 || enLocale[objective.Id].Contains(loc.Name))
                             {
-                                cond.Zones = null;
-                                cond.ConditionType = "Location";
-                                cond.Target = new ListOrT<string>(null, loc.Id);
+                                zoneCond.Zones = null;
+                                zoneCond.ConditionType = "Location";
+                                zoneCond.Target = new ListOrT<string>(null, loc.Id);
                                 break;
                             }
                         }
