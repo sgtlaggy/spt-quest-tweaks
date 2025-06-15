@@ -246,6 +246,11 @@ public class QuestTweaks(
                 }
             }
 
+            if (_config.ExemptQuests.Contains(quest.Id))
+            {
+                continue;
+            }
+
             if (!shouldRemoveConditions)
             {
                 continue;

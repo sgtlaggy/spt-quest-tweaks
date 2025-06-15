@@ -18,7 +18,10 @@ public record Config
     public ConditionsConfig RemoveConditions { get; set; }
 
     [JsonPropertyName("affectRepeatables")]
-    public bool AffectRepeatables {get; set; }
+    public bool AffectRepeatables { get; set; }
+
+    [JsonPropertyName("exemptQuests")]
+    public HashSet<string> ExemptQuests { get; set; }
 
     [JsonPropertyName("lightkeeperOnlyRequireLevel")]
     public int LightkeeperOnlyRequireLevel { get; set; }
