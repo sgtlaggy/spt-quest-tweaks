@@ -27,6 +27,16 @@ public record Constants
         "5bc4826c86f774106d22d88b",
         "5bc4836986f7740c0152911c"
     ];
+    public static readonly HashSet<string> KeyClasses = [
+        BaseClasses.KEY,
+        BaseClasses.KEY_MECHANICAL,
+        BaseClasses.KEYCARD
+    ];
+    public static readonly HashSet<string> HandoverCountItemBlacklist = [
+        ItemTpl.RADIOTRANSMITTER_DIGITAL_SECURE_DSP_RADIO_TRANSMITTER,
+        ItemTpl.BARTER_KOSA_UAV_ELECTRONIC_JAMMING_DEVICE,
+        ItemTpl.INFO_NOTE_WITH_CODE_WORD_VORON,
+    ];
 }
 
 public record LocationInfo
@@ -59,6 +69,7 @@ public class QuestTweaks(
             return Task.CompletedTask;
         }
 
+        var items = _db.GetItems();
         var quests = _db.GetQuests();
         var enLocale = _db.GetLocales().Global["en"].Value;
 
@@ -165,6 +176,16 @@ public class QuestTweaks(
             _logger.Info("Removing found in raid requirement for item hand-ins.");
         }
 
+        if (_config.HandoverItemCount >= 0)
+        {
+            _logger.Info($"Setting required number of items for hand-over to {_config.HandoverItemCount}.");
+        }
+
+        if (_config.EliminationCount >= 0)
+        {
+            _logger.Info($"Setting required number of eliminations to {_config.EliminationCount}.");
+        }
+
         if (_config.LightkeeperOnlyRequireLevel > 0)
         {
             _logger.Info($"Removing Network Provider Part 1 prerequisites, making it available at level {_config.LightkeeperOnlyRequireLevel}.");
@@ -213,7 +234,9 @@ public class QuestTweaks(
         }
 
         var remove = _config.RemoveConditions;
-        var shouldRemoveConditions = remove.AnyEnabled;
+        var shouldModifyConditions = remove.AnyEnabled
+                                     || _config.HandoverItemCount >= 0
+                                     || _config.EliminationCount >= 0;
 
         foreach (var quest in quests.Values)
         {
@@ -251,18 +274,28 @@ public class QuestTweaks(
                 continue;
             }
 
-            if (!shouldRemoveConditions)
+            if (!shouldModifyConditions)
             {
                 continue;
             }
 
             foreach (var objective in objectives)
             {
-                if (remove.FindInRaid
-                    && (objective.ConditionType == "HandoverItem"
-                        || objective.ConditionType == "FindItem"))
+                if (objective.ConditionType == "HandoverItem" || objective.ConditionType == "FindItem")
                 {
-                    objective.OnlyFoundInRaid = false;
+                    if (remove.FindInRaid)
+                    {
+                        objective.OnlyFoundInRaid = false;
+                    }
+
+                    var item = items[objective.Target.List[0]];
+                    if (_config.HandoverItemCount >= 0
+                        && !(item.Properties.QuestItem == true)
+                        && !Constants.KeyClasses.Contains(item.Parent)
+                        && !Constants.HandoverCountItemBlacklist.Contains(item.Id))
+                    {
+                        objective.Value = _config.HandoverItemCount;
+                    }
                 }
 
                 if (objective.ConditionType != "CounterCreator")
@@ -324,6 +357,11 @@ public class QuestTweaks(
                         continue;
                     }
 
+                    if (_config.EliminationCount >= 0 && cond.ConditionType == "Kills")
+                    {
+                        objective.Value = _config.EliminationCount;
+                    }
+
                     if (remove.Target)
                     {
                         cond.SavageRole.Clear();
@@ -379,7 +417,7 @@ public class QuestTweaks(
             }
         }
 
-        if (!(shouldRemoveConditions && _config.AffectRepeatables))
+        if (!(shouldModifyConditions && _config.AffectRepeatables))
         {
             return Task.CompletedTask;
         }
@@ -443,6 +481,7 @@ public class QuestTweaks(
                 }
             }
         }
+
         return Task.CompletedTask;
     }
 }

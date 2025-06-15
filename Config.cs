@@ -17,6 +17,12 @@ public record Config
     [JsonPropertyName("removeConditions")]
     public ConditionsConfig RemoveConditions { get; set; }
 
+    [JsonPropertyName("handoverItemCount")]
+    public int HandoverItemCount { get; set; }
+
+    [JsonPropertyName("eliminationCount")]
+    public int EliminationCount { get; set; }
+
     [JsonPropertyName("affectRepeatables")]
     public bool AffectRepeatables { get; set; }
 

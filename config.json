@@ -18,6 +18,8 @@
         "zone": false,
         "findInRaid": false
     },
+    "handoverItemCount": -1,
+    "eliminationCount": -1,
     "affectRepeatables": true,
     "exemptQuests": [],
 
