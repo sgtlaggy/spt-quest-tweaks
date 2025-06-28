@@ -198,8 +198,8 @@ public class QuestTweaks(
                 ConditionType = "Level",
                 CompareMethod = ">=",
                 Value = _config.LightkeeperOnlyRequireLevel,
+                DynamicLocale = false,
                 // Index = 0,
-                // DynamicLocale = false,
                 // GlobalQuestCounterId = "",
                 // ParentId = "",
                 // VisibilityConditions = []
@@ -435,7 +435,7 @@ public class QuestTweaks(
 
                 if (quest.QuestConfig.Exploration is not null)
                 {
-                    quest.QuestConfig.Exploration.SpecificExits.Probability = 0;
+                    quest.QuestConfig.Exploration.SpecificExits.Chance = 0;
                 }
             }
 
@@ -466,13 +466,13 @@ public class QuestTweaks(
 
                 if (remove.Weapon)
                 {
-                    elim.WeaponCategoryRequirementProbability = 0;
-                    elim.WeaponRequirementProbability = 0;
+                    elim.WeaponCategoryRequirementChance = 0;
+                    elim.WeaponRequirementChance = 0;
                 }
 
                 if (remove.BodyPart)
                 {
-                    elim.BodyPartProbability = 0;
+                    elim.BodyPartChance = 0;
                 }
 
                 if (remove.Distance)
