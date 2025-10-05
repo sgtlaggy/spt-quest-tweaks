@@ -1,10 +1,10 @@
-# sgtlaggy's Quest Tweaks
-
 ## Reveal All Quest Objectives
+
+⚠️ **This may lead to completing objectives out of order, Survive and Extract can be completed before the normally prerequisite objectives. Any currently active quests will have their objectives still revealed if the setting is disabled or the mod is removed.**
 
 Reveal all objectives that are hidden by default and only show up after completing other objectives.
 
-One example is Broadcast - Part 1, the objective to place the Signal Jammer doesn't appear until you've entered the room.
+One example is [Broadcast - Part 1](https://escapefromtarkov.fandom.com/wiki/Broadcast_-_Part_1), the objective to place the Signal Jammer doesn't appear until you've entered the room.
 
 ## Reveal Unknown Quest Rewards
 
@@ -16,19 +16,22 @@ Remove waiting periods after some quests like Gunsmith.
 
 ## Remove Tedious Conditions
 
-The following objective conditions can be removed:
+ℹ️ This is similar to [kiki-RemoveTediousQuestConditions](https://forge.sp-tarkov.com/mod/336/kiki-removetediousquestconditions).
 
-- Elimination target (PMC, scav, boss, etc)
-- Weapon and mods
+The following objective conditions can be removed.
+Any marked with 🔃 also will also apply to repeatable quests by defaults.
+
+- 🔃 Elimination target (PMC, scav, boss, etc)
+- 🔃 Weapon and mods
 - Equipment
 - Health/status effects (stun, dehydration)
-- Body parts
-- Distance
+- 🔃 Body parts
+- 🔃 Distance
 - Time
-- Map/location
+- 🔃 Map/location
 - Zone
   - Removing zone but not map conditions will expand it to the map.
-- Item found-in-raid status
+- 🔃 Item found-in-raid status
 
 An additional setting toggles whether these also apply to repeatable quests.
 
@@ -42,6 +45,8 @@ These options will set a specific value for all quests to use when requiring kil
 The item setting does not apply to quest items like the Bronze Pocket Watch or keys/keycards.
 
 ## Only Require Level to start Lightkeeper
+
+ℹ️ This is the same feature provided by [Lightkeeper Questline Patch](https://forge.sp-tarkov.com/mod/1521/lightkeeper-questline-patch).
 
 This option will remove all the prerequisite quests to start `Network Provider - Part 1` and will only require a specific level. A value of `0` will disable this feature and leave the prerequisites in place.
 
