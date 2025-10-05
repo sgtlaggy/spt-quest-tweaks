@@ -18,14 +18,15 @@ namespace sgtlaggyQuestTweaks;
 
 public record Constants
 {
-    public static readonly string NetworkProviderPart1 = "625d6ff5ddc94657c21a1625";
     public static readonly string[] TarkovShooter = [
-        "5bc4776586f774512d07cf05",
-        "5bc479e586f7747f376c7da3",
-        "5bc47dbf86f7741ee74e93b9",
-        "5bc480a686f7741af0342e29",
-        "5bc4826c86f774106d22d88b",
-        "5bc4836986f7740c0152911c"
+        QuestTpl.THE_TARKOV_SHOOTER_PART_1,
+        QuestTpl.THE_TARKOV_SHOOTER_PART_2,
+        QuestTpl.THE_TARKOV_SHOOTER_PART_3,
+        QuestTpl.THE_TARKOV_SHOOTER_PART_4,
+        QuestTpl.THE_TARKOV_SHOOTER_PART_5,
+        QuestTpl.THE_TARKOV_SHOOTER_PART_6,
+        QuestTpl.THE_TARKOV_SHOOTER_PART_7,
+        QuestTpl.THE_TARKOV_SHOOTER_PART_8,
     ];
     public static readonly HashSet<string> KeyClasses = [
         BaseClasses.KEY,
@@ -189,7 +190,7 @@ public class QuestTweaks(
         if (_config.LightkeeperOnlyRequireLevel > 0)
         {
             _logger.Info($"Removing Network Provider Part 1 prerequisites, making it available at level {_config.LightkeeperOnlyRequireLevel}.");
-            var conditions = quests[Constants.NetworkProviderPart1].Conditions.AvailableForStart;
+            var conditions = quests[QuestTpl.NETWORK_PROVIDER_PART_1].Conditions.AvailableForStart;
             var reuseId = conditions[0].Id;
             conditions.Clear();
             conditions.Add(new QuestCondition
@@ -208,7 +209,7 @@ public class QuestTweaks(
 
         if (_config.TarkovShooterM10)
         {
-            _logger.Info("Adding Sako TRG M10 to Tarkov Shooter 1-6.");
+            _logger.Info("Adding Sako TRG M10 to old Tarkov Shooter quests.");
 
             foreach (var questId in Constants.TarkovShooter)
             {
@@ -252,7 +253,7 @@ public class QuestTweaks(
 
             if (_config.RevealUnknownRewards)
             {
-                foreach (var reward in quest.Rewards.Success)
+                foreach (var reward in quest.Rewards["Success"])
                 {
                     reward.Unknown = false;
                 }
@@ -376,8 +377,8 @@ public class QuestTweaks(
 
                     if (remove.WeaponMods)
                     {
-                        cond.WeaponModsExclusive.Clear();
-                        cond.WeaponModsInclusive.Clear();
+                        cond.WeaponModsExclusive = default;
+                        cond.WeaponModsInclusive = default;
                     }
 
                     if (remove.EnemyHealthEffect)
@@ -387,8 +388,8 @@ public class QuestTweaks(
 
                     if (remove.EnemyGear)
                     {
-                        cond.EnemyEquipmentExclusive.Clear();
-                        cond.EnemyEquipmentInclusive.Clear();
+                        cond.EnemyEquipmentExclusive = default;
+                        cond.EnemyEquipmentInclusive = default;
                     }
 
                     if (remove.BodyPart)
@@ -433,15 +434,18 @@ public class QuestTweaks(
                     [ELocationName.any] = ["any"]
                 };
 
-                if (quest.QuestConfig.Exploration is not null)
+                foreach (var exploration in quest.QuestConfig.ExplorationConfig)
                 {
-                    quest.QuestConfig.Exploration.SpecificExits.Chance = 0;
+                    exploration.SpecificExits.Chance = 0;
                 }
             }
 
-            if (remove.FindInRaid && (quest.QuestConfig.Completion is not null))
+            if (remove.FindInRaid)
             {
-                quest.QuestConfig.Completion.RequiredItemsAreFiR = false;
+                foreach (var completion in quest.QuestConfig.CompletionConfig)
+                {
+                    completion.RequiredItemsAreFiR = false;
+                }
             }
 
             var elims = quest.QuestConfig.Elimination;
@@ -488,16 +492,15 @@ public class QuestTweaks(
 
 public record ModMetadata : AbstractModMetadata
 {
-    public override string Name { get; set; } = "sgtlaggy's Quest Tweaks";
-    public override string Author { get; set; } = "sgtlaggy";
-    public override string Version { get; set; } = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-    public override string Url { get; set; } = "https://github.com/sgtlaggy/spt-quest-tweaks";
-    public override string Licence { get; set; } = "MIT";
-    public override string SptVersion { get; set; } = "~4.0.0";
-    public override List<string> Contributors { get; set; }
-    public override List<string> LoadBefore { get; set; }
-    public override List<string> LoadAfter { get; set; }
-    public override List<string> Incompatibilities { get; set; }
-    public override Dictionary<string, string> ModDependencies { get; set; }
-    public override bool? IsBundleMod { get; set; }
+    public override string Name { get; init; } = "sgtlaggy's Quest Tweaks";
+    public override string ModGuid { get; init; } = "com.sgtlaggy.questtweaks";
+    public override string Author { get; init; } = "sgtlaggy";
+    public override SemanticVersioning.Version Version { get; init; } = new(Assembly.GetExecutingAssembly().GetName().Version.ToString());
+    public override string Url { get; init; } = "https://github.com/sgtlaggy/spt-quest-tweaks";
+    public override string License { get; init; } = "MIT";
+    public override SemanticVersioning.Version SptVersion { get; init; } = new("~4.0.0");
+    public override List<string> Contributors { get; init; }
+    public override List<string> Incompatibilities { get; init; }
+    public override Dictionary<string, SemanticVersioning.Version> ModDependencies { get; init; }
+    public override bool? IsBundleMod { get; init; }
 }

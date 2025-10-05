@@ -28,7 +28,8 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease14" />
+    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-pre.20251002.2103" />
+    <PackageReference Include="SPTarkov.DI" Version="4.0.0-pre.20251002.2103" />
   </ItemGroup>
 
 </Project>
