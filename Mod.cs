@@ -486,6 +486,12 @@ public class QuestTweaks(
             }
         }
 
+#if DEBUG
+        // Dump modified quest database to a file for quick inspection in debug builds.
+        var dumpFile = System.IO.Path.Join(_modDir, "dump.json");
+        File.WriteAllText(dumpFile, _json.Serialize(quests, true));
+#endif
+
         return Task.CompletedTask;
     }
 }
