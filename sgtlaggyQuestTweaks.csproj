@@ -14,22 +14,29 @@
   <PropertyGroup>
     <DistDir>dist</DistDir>
     <DirToZip>$(DistDir)\zip</DirToZip>
-    <ModDir>$(DirToZip)\user\mods\$(MSBuildProjectName)</ModDir>
+    <ModDir>$(DirToZip)\SPT\user\mods\$(MSBuildProjectName)</ModDir>
   </PropertyGroup>
 
-  <Target Name="Zip" AfterTargets="AfterBuild">
+  <Target Name="BuildDist" AfterTargets="AfterBuild">
+    <RemoveDir Directories="$(DistDir)" />
     <Copy
         SourceFiles="$(TargetPath);config.json"
         DestinationFolder="$(ModDir)"/>
+  </Target>
+  <Target Name="CopyPDB" AfterTargets="BuildDist" Condition="'$(Configuration)' == 'Debug'">
+    <Copy
+        SourceFiles="$(TargetDir)$(TargetName).pdb"
+        DestinationFolder="$(ModDir)"/>
+  </Target>
+  <Target Name="Zip" AfterTargets="BuildDist" Condition="'$(Configuration)' == 'Release'">
     <ZipDirectory
         SourceDirectory="$(DirToZip)"
-        DestinationFile="$(DistDir)\$(MSBuildProjectName)-$(Version).zip"
-        Overwrite="true"/>
+        DestinationFile="$(DistDir)\$(MSBuildProjectName)-$(Version).zip"/>
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-pre.20251002.2103" />
-    <PackageReference Include="SPTarkov.DI" Version="4.0.0-pre.20251002.2103" />
+    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-pre.20251007.1604" />
+    <PackageReference Include="SPTarkov.DI" Version="4.0.0-pre.20251007.1604" />
   </ItemGroup>
 
 </Project>
