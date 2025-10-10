@@ -15,7 +15,7 @@ public record Config
     public bool RemoveTimeGates { get; set; }
 
     [JsonPropertyName("removeConditions")]
-    public ConditionsConfig RemoveConditions { get; set; }
+    public required ConditionsConfig RemoveConditions { get; set; }
 
     [JsonPropertyName("handoverItemCount")]
     public int HandoverItemCount { get; set; }
@@ -27,7 +27,7 @@ public record Config
     public bool AffectRepeatables { get; set; }
 
     [JsonPropertyName("exemptQuests")]
-    public HashSet<string> ExemptQuests { get; set; }
+    public required HashSet<string> ExemptQuests { get; set; }
 
     [JsonPropertyName("lightkeeperOnlyRequireLevel")]
     public int LightkeeperOnlyRequireLevel { get; set; }

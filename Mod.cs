@@ -18,7 +18,7 @@ namespace sgtlaggyQuestTweaks;
 
 public record Constants
 {
-    public static readonly string[] TarkovShooter = [
+    public static string[] TarkovShooter = [
         QuestTpl.THE_TARKOV_SHOOTER_PART_1,
         QuestTpl.THE_TARKOV_SHOOTER_PART_2,
         QuestTpl.THE_TARKOV_SHOOTER_PART_3,
@@ -28,24 +28,19 @@ public record Constants
         QuestTpl.THE_TARKOV_SHOOTER_PART_7,
         QuestTpl.THE_TARKOV_SHOOTER_PART_8,
     ];
-    public static readonly HashSet<string> KeyClasses = [
+    public static HashSet<string> KeyClasses = [
         BaseClasses.KEY,
         BaseClasses.KEY_MECHANICAL,
         BaseClasses.KEYCARD
     ];
-    public static readonly HashSet<string> HandoverCountItemBlacklist = [
+    public static HashSet<string> HandoverCountItemBlacklist = [
         ItemTpl.RADIOTRANSMITTER_DIGITAL_SECURE_DSP_RADIO_TRANSMITTER,
         ItemTpl.BARTER_KOSA_UAV_ELECTRONIC_JAMMING_DEVICE,
         ItemTpl.INFO_NOTE_WITH_CODE_WORD_VORON,
     ];
 }
 
-public record LocationInfo
-{
-    public string Name;
-    public string Id;
-    public string MongoId;
-}
+public record LocationInfo(string Name, string Id, string MongoId);
 
 [Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 1)]
 public class QuestTweaks(
@@ -55,8 +50,8 @@ public class QuestTweaks(
     JsonUtil _json
 ) : IOnLoad
 {
-    protected Config _config;
-    protected string _modDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+    protected Config? _config;
+    protected string _modDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 
     public Task OnLoad()
     {
@@ -69,30 +64,33 @@ public class QuestTweaks(
             _logger.Error("Invalid config.");
             return Task.CompletedTask;
         }
+        if (_config is null)
+        {
+            _logger.Error("Missing config.");
+            return Task.CompletedTask;
+        }
 
         var items = _db.GetItems();
         var quests = _db.GetQuests();
-        var enLocale = _db.GetLocales().Global["en"].Value;
+        var enLocale = _db.GetLocales().Global["en"].Value!;
 
         var locations = _db.GetLocations().GetDictionary().Values
             .Where(loc => loc.Base?.Enabled ?? false)
             .Select(
-                (loc) => new LocationInfo
-                {
+                (loc) => new LocationInfo(
                     // Terminal/Lab are undefined using ‘.Id’, need to get "proper" name
-                    Name = enLocale[loc.Base.Id] ?? enLocale[$"{loc.Base.IdField} Name"],
-                    Id = loc.Base.Id,
-                    MongoId = loc.Base.IdField
-                }
+                    enLocale[loc.Base.Id] ?? enLocale[$"{loc.Base.IdField} Name"],
+                    loc.Base.Id,
+                    loc.Base.IdField
+                )
             );
         // special-case factory night because it’s not enabled and name in locale is "Night Factory"
-        var factoryNight = _db.GetLocation(ELocationName.factory4_night.ToString()).Base;
-        locations.Append(new LocationInfo
-        {
-            Name = "Factory",
-            Id = factoryNight.Id,
-            MongoId = factoryNight.IdField
-        });
+        var factoryNight = _db.GetLocation(ELocationName.factory4_night.ToString())!.Base;
+        locations.Append(new LocationInfo(
+            "Factory",
+            factoryNight.Id,
+            factoryNight.IdField
+        ));
 
         // if (_config.RevealAllQuestObjectives)
         // {
@@ -189,8 +187,8 @@ public class QuestTweaks(
 
         if (_config.LightkeeperOnlyRequireLevel > 0)
         {
-            var conditions = quests[QuestTpl.NETWORK_PROVIDER_PART_1].Conditions.AvailableForStart;
             // _logger.Info($"Removing Network Provider Part 1 prerequisites, making it available at level {_config.LightkeeperOnlyRequireLevel}.");
+            var conditions = quests[QuestTpl.NETWORK_PROVIDER_PART_1].Conditions.AvailableForStart!;
             var reuseId = conditions[0].Id;
             conditions.Clear();
             conditions.Add(new QuestCondition
@@ -213,22 +211,22 @@ public class QuestTweaks(
 
             foreach (var questId in Constants.TarkovShooter)
             {
-                var conditions = quests[questId].Conditions.AvailableForFinish;
-                foreach (var counter in conditions)
+                var conditions = quests[questId].Conditions.AvailableForFinish!;
+                foreach (var objective in conditions)
                 {
-                    if (counter.ConditionType != "CounterCreator")
+                    if (objective.ConditionType != "CounterCreator")
                     {
                         continue;
                     }
 
-                    foreach (var cond in counter.Counter.Conditions)
+                    foreach (var condition in objective.Counter!.Conditions!)
                     {
-                        if (cond.ConditionType != "Kills" && cond.ConditionType != "Shots")
+                        if (condition.ConditionType != "Kills" && condition.ConditionType != "Shots")
                         {
                             continue;
                         }
 
-                        cond.Weapon.Add(ItemTpl.SNIPERRIFLE_SAKO_TRG_M10_338_LM_BOLTACTION_SNIPER_RIFLE);
+                        condition.Weapon!.Add(ItemTpl.SNIPERRIFLE_SAKO_TRG_M10_338_LM_BOLTACTION_SNIPER_RIFLE);
                     }
                 }
             }
@@ -241,27 +239,30 @@ public class QuestTweaks(
 
         foreach (var quest in quests.Values)
         {
-            var objectives = quest.Conditions.AvailableForFinish;
+            var objectives = quest.Conditions.AvailableForFinish!;
 
             if (_config.RevealAllQuestObjectives)
             {
                 foreach (var objective in objectives)
                 {
-                    objective.VisibilityConditions.Clear();
+                    objective.VisibilityConditions?.Clear();
                 }
             }
 
             if (_config.RevealUnknownRewards)
             {
-                foreach (var reward in quest.Rewards["Success"])
+                if (quest.Rewards is not null)
                 {
-                    reward.Unknown = false;
+                    foreach (var reward in quest.Rewards["Success"])
+                    {
+                        reward.Unknown = false;
+                    }
                 }
             }
 
             if (_config.RemoveTimeGates)
             {
-                foreach (var prereq in quest.Conditions.AvailableForStart)
+                foreach (var prereq in quest.Conditions.AvailableForStart!)
                 {
                     if (prereq.AvailableAfter is not null)
                     {
@@ -289,9 +290,17 @@ public class QuestTweaks(
                         objective.OnlyFoundInRaid = false;
                     }
 
-                    var item = items[objective.Target.List[0]];
+                    TemplateItem item;
+                    if (objective.Target!.IsList)
+                    {
+                        item = items[objective.Target.List![0]];
+                    }
+                    else
+                    {
+                        item = items[objective.Target.Item!];
+                    }
                     if (_config.HandoverItemCount >= 0
-                        && !(item.Properties.QuestItem == true)
+                        && !(item.Properties!.QuestItem == true)
                         && !Constants.KeyClasses.Contains(item.Parent)
                         && !Constants.HandoverCountItemBlacklist.Contains(item.Id))
                     {
@@ -306,7 +315,7 @@ public class QuestTweaks(
 
                 if (remove.Zone && !remove.Map)
                 {
-                    var zoneCond = objective.Counter.Conditions.Find(
+                    var zoneCond = objective.Counter!.Conditions!.Find(
                         cond => cond.ConditionType == "InZone");
                     var mapCond = objective.Counter.Conditions.Find(
                         cond => cond.ConditionType == "Location");
@@ -327,14 +336,14 @@ public class QuestTweaks(
                                 // already replaced, support Factory and Ground Zero variants
                                 else
                                 {
-                                    zoneCond.Target.List.Append(loc.Id);
+                                    zoneCond.Target!.List!.Append(loc.Id);
                                 }
                             }
                         }
                     }
                 }
 
-                objective.Counter.Conditions.RemoveAll(cond =>
+                objective.Counter!.Conditions!.RemoveAll(cond =>
                     (remove.SelfHealthEffect && cond.ConditionType == "HealthEffect")
                     || (remove.SelfGear && cond.ConditionType == "Equipment")
                     || (remove.Map && cond.ConditionType == "Location")
@@ -351,64 +360,64 @@ public class QuestTweaks(
                     continue;
                 }
 
-                foreach (var cond in objective.Counter.Conditions)
+                foreach (var condition in objective.Counter.Conditions)
                 {
-                    if (cond.ConditionType != "Shots" && cond.ConditionType != "Kills")
+                    if (condition.ConditionType != "Shots" && condition.ConditionType != "Kills")
                     {
                         continue;
                     }
 
-                    if (_config.EliminationCount >= 0 && cond.ConditionType == "Kills")
+                    if (_config.EliminationCount >= 0 && condition.ConditionType == "Kills")
                     {
                         objective.Value = _config.EliminationCount;
                     }
 
                     if (remove.Target)
                     {
-                        cond.SavageRole.Clear();
-                        cond.Target = new ListOrT<string>(default, "Any");
+                        condition.SavageRole?.Clear();
+                        condition.Target = new ListOrT<string>(default, "Any");
                     }
 
                     if (remove.Weapon)
                     {
-                        cond.Weapon.Clear();
-                        cond.WeaponCaliber.Clear();
+                        condition.Weapon?.Clear();
+                        condition.WeaponCaliber?.Clear();
                     }
 
                     if (remove.WeaponMods)
                     {
-                        cond.WeaponModsExclusive = default;
-                        cond.WeaponModsInclusive = default;
+                        condition.WeaponModsExclusive = [];
+                        condition.WeaponModsInclusive = [];
                     }
 
                     if (remove.EnemyHealthEffect)
                     {
-                        cond.EnemyHealthEffects.Clear();
+                        condition.EnemyHealthEffects?.Clear();
                     }
 
                     if (remove.EnemyGear)
                     {
-                        cond.EnemyEquipmentExclusive = default;
-                        cond.EnemyEquipmentInclusive = default;
+                        condition.EnemyEquipmentExclusive = [];
+                        condition.EnemyEquipmentInclusive = [];
                     }
 
                     if (remove.BodyPart)
                     {
-                        cond.BodyPart.Clear();
+                        condition.BodyPart?.Clear();
                     }
 
                     if (remove.Distance)
                     {
-                        cond.Distance = new CounterConditionDistance
+                        condition.Distance = new CounterConditionDistance
                         {
                             CompareMethod = ">=",
                             Value = 0
                         };
                     }
 
-                    if (remove.Time)
+                    if (remove.Time && (condition.Daytime is not null))
                     {
-                        cond.Daytime = new DaytimeCounter
+                        condition.Daytime = new DaytimeCounter
                         {
                             From = 0,
                             To = 0
@@ -449,7 +458,7 @@ public class QuestTweaks(
             }
 
             var elims = quest.QuestConfig.Elimination;
-            if (elims is not null)
+            if (elims is null)
             {
                 continue;
             }
@@ -501,12 +510,12 @@ public record ModMetadata : AbstractModMetadata
     public override string Name { get; init; } = "sgtlaggy's Quest Tweaks";
     public override string ModGuid { get; init; } = "com.sgtlaggy.questtweaks";
     public override string Author { get; init; } = "sgtlaggy";
-    public override SemanticVersioning.Version Version { get; init; } = new(Assembly.GetExecutingAssembly().GetName().Version.ToString());
-    public override string Url { get; init; } = "https://github.com/sgtlaggy/spt-quest-tweaks";
+    public override SemanticVersioning.Version Version { get; init; } = new(Assembly.GetExecutingAssembly().GetName().Version!.ToString(3));
+    public override string? Url { get; init; } = "https://github.com/sgtlaggy/spt-quest-tweaks";
     public override string License { get; init; } = "MIT";
-    public override SemanticVersioning.Version SptVersion { get; init; } = new("~4.0.0");
-    public override List<string> Contributors { get; init; }
-    public override List<string> Incompatibilities { get; init; }
-    public override Dictionary<string, SemanticVersioning.Version> ModDependencies { get; init; }
+    public override SemanticVersioning.Range SptVersion { get; init; } = new("~4.0.0");
+    public override List<string>? Contributors { get; init; }
+    public override List<string>? Incompatibilities { get; init; }
+    public override Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; }
     public override bool? IsBundleMod { get; init; }
 }
