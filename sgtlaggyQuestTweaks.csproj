@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <Target Name="BuildDist" AfterTargets="AfterBuild">
-    <RemoveDir Directories="$(DistDir)" />
+    <RemoveDir Directories="$(DistDir)"/>
     <Copy
         SourceFiles="$(TargetPath);config.json"
         DestinationFolder="$(ModDir)"/>
@@ -36,8 +36,8 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-pre.20251007.1604" />
-    <PackageReference Include="SPTarkov.DI" Version="4.0.0-pre.20251007.1604" />
+    <PackageReference Include="SPTarkov.Server.Core" Version="4.0.0" />
+    <PackageReference Include="SPTarkov.DI" Version="4.0.0" />
   </ItemGroup>
 
 </Project>
