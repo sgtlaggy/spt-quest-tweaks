@@ -77,13 +77,25 @@ public class Mod(
         var locations = _db.GetLocations().GetDictionary().Values
             .Where(loc => loc.Base?.Enabled ?? false)
             .Select(
-                (loc) => new LocationInfo(
-                    // Terminal/Lab are undefined using ‘.Id’, need to get "proper" name
-                    enLocale[loc.Base.Id] ?? enLocale[$"{loc.Base.IdField} Name"],
-                    loc.Base.Id,
-                    loc.Base.IdField
-                )
-            );
+                (loc) =>
+                {
+                    string? name;
+                    if (!enLocale.TryGetValue(loc.Base.Id, out name))
+                    {
+                        if (!enLocale.TryGetValue($"{loc.Base.IdField} Name", out name))
+                        {
+                            return null;
+                        }
+                    }
+                    return new LocationInfo(
+                        // Terminal/Lab are undefined using ‘.Id’, need to get "proper" name
+                        name,
+                        loc.Base.Id,
+                        loc.Base.IdField
+                    );
+                }
+            )
+            .Where(info => (info is not null));
         // special-case factory night because it’s not enabled and name in locale is "Night Factory"
         var factoryNight = _db.GetLocation(ELocationName.factory4_night.ToString())!.Base;
         locations.Append(new LocationInfo(
@@ -324,7 +336,7 @@ public class Mod(
                     {
                         foreach (var loc in locations)
                         {
-                            if (quest.Location == loc.MongoId
+                            if (quest.Location == loc!.MongoId
                                 || enLocale[objective.Id].Contains(loc.Name))
                             {
                                 if (zoneCond.ConditionType == "InZone")
