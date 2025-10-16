@@ -448,19 +448,6 @@ public class Mod(
 
         foreach (var quest in questConfig.RepeatableQuests)
         {
-            if (remove.Map)
-            {
-                quest.Locations = new Dictionary<ELocationName, List<string>>
-                {
-                    [ELocationName.any] = ["any"]
-                };
-
-                foreach (var exploration in quest.QuestConfig.ExplorationConfig)
-                {
-                    exploration.SpecificExits.Chance = 0;
-                }
-            }
-
             if (remove.FindInRaid)
             {
                 foreach (var completion in quest.QuestConfig.CompletionConfig)

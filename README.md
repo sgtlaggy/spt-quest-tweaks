@@ -28,7 +28,7 @@ Any marked with 🔃 also will also apply to repeatable quests by defaults.
 - 🔃 Body parts
 - 🔃 Distance
 - Time
-- 🔃 Map/location
+- Map/location
 - Zone
   - Removing zone but not map conditions will expand it to the map.
 - 🔃 Item found-in-raid status
