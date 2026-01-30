@@ -40,7 +40,7 @@ Modded quests can also be added. Their quest IDs can be found in some file in th
 
 ## Set Number For Eliminations and Items to Hand Over
 
-These options will set a specific value for all quests to use when requiring kills or item turn-ins, respected by ‘exemptQuests‘ list.
+These options will set a percent of original value or flat value across the board for all quests to use when requiring kills or item turn-ins, respected by ‘exemptQuests‘ list.
 
 The item setting does not apply to quest items like the Bronze Pocket Watch or keys/keycards.
 
