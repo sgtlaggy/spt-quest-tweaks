@@ -5,7 +5,6 @@ using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Models.Spt.Mod;
 using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
@@ -502,19 +501,4 @@ public class Mod(
 
         return Task.CompletedTask;
     }
-}
-
-public record ModMetadata : AbstractModMetadata
-{
-    public override string Name { get; init; } = "sgtlaggy's Quest Tweaks";
-    public override string ModGuid { get; init; } = "com.sgtlaggy.questtweaks";
-    public override string Author { get; init; } = "sgtlaggy";
-    public override SemanticVersioning.Version Version { get; init; } = new(Assembly.GetExecutingAssembly().GetName().Version!.ToString(3));
-    public override string? Url { get; init; } = "https://github.com/sgtlaggy/spt-quest-tweaks";
-    public override string License { get; init; } = "MIT";
-    public override SemanticVersioning.Range SptVersion { get; init; } = new("~4.0.0");
-    public override List<string>? Contributors { get; init; }
-    public override List<string>? Incompatibilities { get; init; }
-    public override Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; }
-    public override bool? IsBundleMod { get; init; }
 }
