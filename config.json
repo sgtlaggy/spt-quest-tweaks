@@ -19,7 +19,9 @@
         "findInRaid": false
     },
     "handoverItemCount": -1,
+    "handoverItemPercent": -1,
     "eliminationCount": -1,
+    "eliminationPercent": -1,
     "affectRepeatables": true,
     "exemptQuests": [],
 

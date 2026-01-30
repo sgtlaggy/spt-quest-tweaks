@@ -20,8 +20,14 @@ public record Config
     [JsonPropertyName("handoverItemCount")]
     public int HandoverItemCount { get; set; }
 
+    [JsonPropertyName("handoverItemPercent")]
+    public int HandoverItemPercent { get; set; }
+
     [JsonPropertyName("eliminationCount")]
     public int EliminationCount { get; set; }
+
+    [JsonPropertyName("eliminationPercent")]
+    public int EliminationPercent { get; set; }
 
     [JsonPropertyName("affectRepeatables")]
     public bool AffectRepeatables { get; set; }

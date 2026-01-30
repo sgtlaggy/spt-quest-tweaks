@@ -245,6 +245,8 @@ public class Mod(
 
         var remove = _config.RemoveConditions;
         var shouldModifyConditions = remove.AnyEnabled
+                                     || _config.HandoverItemPercent >= 0
+                                     || _config.EliminationPercent >= 0
                                      || _config.HandoverItemCount >= 0
                                      || _config.EliminationCount >= 0;
 
@@ -310,12 +312,11 @@ public class Mod(
                     {
                         item = items[objective.Target.Item!];
                     }
-                    if (_config.HandoverItemCount >= 0
-                        && !(item.Properties!.QuestItem == true)
+                    if (!(item.Properties!.QuestItem == true)
                         && !Constants.KeyClasses.Contains(item.Parent)
                         && !Constants.HandoverCountItemBlacklist.Contains(item.Id))
                     {
-                        objective.Value = _config.HandoverItemCount;
+                        objective.Value = GetNewObjectiveValue(objective.Value, _config.HandoverItemCount, _config.HandoverItemPercent);
                     }
                 }
 
@@ -378,9 +379,10 @@ public class Mod(
                         continue;
                     }
 
-                    if (_config.EliminationCount >= 0 && condition.ConditionType == "Kills")
+                    if ((_config.EliminationCount >= 0 || _config.EliminationPercent >= 0)
+                        && condition.ConditionType == "Kills")
                     {
-                        objective.Value = _config.EliminationCount;
+                        objective.Value = GetNewObjectiveValue(objective.Value, _config.EliminationCount, _config.EliminationPercent);
                     }
 
                     if (remove.Target)
@@ -500,5 +502,33 @@ public class Mod(
 #endif
 
         return Task.CompletedTask;
+    }
+
+    private double? GetNewObjectiveValue(double? original, int absolute, int percent)
+    {
+        if (original is null)
+        {
+            return null;
+        }
+
+        if (absolute >= 0)
+        {
+            return absolute;
+        }
+
+        if (percent >= 0)
+        {
+            var value = Double.Round(original.Value * percent / 100);
+            if (value == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return value;
+            }
+        }
+
+        return original;
     }
 }
