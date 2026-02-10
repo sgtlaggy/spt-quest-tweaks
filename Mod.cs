@@ -2,6 +2,7 @@
 using System.Text.Json;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Utils;
@@ -52,25 +53,9 @@ public class Mod(
     protected Config? _config;
     protected string _modDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 
-    public Task OnLoad()
+    public void ModifyQuests(Dictionary<MongoId, Quest> quests)
     {
-        try
-        {
-            _config = _json.DeserializeFromFile<Config>(System.IO.Path.Join(_modDir, "config.json"));
-        }
-        catch (JsonException)
-        {
-            _logger.Error("Invalid config.");
-            return Task.CompletedTask;
-        }
-        if (_config is null)
-        {
-            _logger.Error("Missing config.");
-            return Task.CompletedTask;
-        }
-
         var items = _db.GetItems();
-        var quests = _db.GetQuests();
         var enLocale = _db.GetLocales().Global["en"].Value!;
 
         var locations = _db.GetLocations().GetDictionary().Values
@@ -196,7 +181,7 @@ public class Mod(
         //     _logger.Info($"Setting required number of eliminations to {_config.EliminationCount}.");
         // }
 
-        if (_config.LightkeeperOnlyRequireLevel > 0)
+        if (_config!.LightkeeperOnlyRequireLevel > 0)
         {
             // _logger.Info($"Removing Network Provider Part 1 prerequisites, making it available at level {_config.LightkeeperOnlyRequireLevel}.");
             var conditions = quests[QuestTpl.NETWORK_PROVIDER_PART_1].Conditions.AvailableForStart!;
@@ -442,7 +427,7 @@ public class Mod(
 
         if (!(shouldModifyConditions && _config.AffectRepeatables))
         {
-            return Task.CompletedTask;
+            return;
         }
 
         var questConfig = _configServer.GetConfig<QuestConfig>();
@@ -494,6 +479,38 @@ public class Mod(
                 }
             }
         }
+    }
+
+    protected bool LoadConfig()
+    {
+        try
+        {
+            _config = _json.DeserializeFromFile<Config>(System.IO.Path.Join(_modDir, "config.json"));
+        }
+        catch (JsonException)
+        {
+            _logger.Error("Invalid config.");
+            return false;
+        }
+
+        if (_config is null)
+        {
+            _logger.Error("Missing config.");
+            return false;
+        }
+
+        return true;
+    }
+    
+    public Task OnLoad()
+    {
+        if (!LoadConfig())
+        {
+            return Task.CompletedTask;
+        }
+
+        var quests = _db.GetQuests();
+        ModifyQuests(quests);
 
 #if DEBUG
         // Dump modified quest database to a file for quick inspection in debug builds.
