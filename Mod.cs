@@ -17,9 +17,9 @@ using Path = System.IO.Path;
 
 namespace sgtlaggyQuestTweaks;
 
-public record Constants
+public static class Constants
 {
-    public static string[] TarkovShooter = [
+    public static readonly string[] TarkovShooter = [
         QuestTpl.THE_TARKOV_SHOOTER_PART_1,
         QuestTpl.THE_TARKOV_SHOOTER_PART_2,
         QuestTpl.THE_TARKOV_SHOOTER_PART_3,
@@ -29,12 +29,12 @@ public record Constants
         QuestTpl.THE_TARKOV_SHOOTER_PART_7,
         QuestTpl.THE_TARKOV_SHOOTER_PART_8,
     ];
-    public static HashSet<string> KeyClasses = [
+    public static readonly HashSet<string> KeyClasses = [
         BaseClasses.KEY,
         BaseClasses.KEY_MECHANICAL,
         BaseClasses.KEYCARD
     ];
-    public static HashSet<string> HandoverCountItemBlacklist = [
+    public static readonly HashSet<string> HandoverCountItemBlacklist = [
         ItemTpl.RADIOTRANSMITTER_DIGITAL_SECURE_DSP_RADIO_TRANSMITTER,
         ItemTpl.BARTER_KOSA_UAV_ELECTRONIC_JAMMING_DEVICE,
         ItemTpl.INFO_NOTE_WITH_CODE_WORD_VORON,
@@ -45,21 +45,21 @@ public record LocationInfo(string Name, string Id, string MongoId);
 
 [Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 999)]
 public class Mod(
-    ISptLogger<Mod> _logger,
-    DatabaseService _db,
-    ConfigServer _configServer,
-    JsonUtil _json
+    ISptLogger<Mod> logger,
+    DatabaseService db,
+    ConfigServer configServer,
+    JsonUtil json
 ) : IOnLoad
 {
-    protected Config? _config;
-    protected string _modDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+    private Config? _config;
+    private readonly string _modDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 
-    public void ModifyQuests(Dictionary<MongoId, Quest> quests)
+    private void ModifyQuests(Dictionary<MongoId, Quest> quests)
     {
-        var items = _db.GetItems();
-        var enLocale = _db.GetLocales().Global["en"].Value!;
+        var items = db.GetItems();
+        var enLocale = db.GetLocales().Global["en"].Value!;
 
-        var locations = _db.GetLocations().GetDictionary().Values
+        var locations = db.GetLocations().GetDictionary().Values
             .Where(loc => loc.Base?.Enabled ?? false)
             .Select(
                 (loc) =>
@@ -83,7 +83,7 @@ public class Mod(
             .Where(info => (info is not null))
             .ToList();
         // special-case factory night because it’s not enabled and name in locale is "Night Factory"
-        var factoryNight = _db.GetLocation(ELocationName.factory4_night.ToString())!.Base;
+        var factoryNight = db.GetLocation(nameof(ELocationName.factory4_night))!.Base;
         locations.Add(new LocationInfo(
             "Factory",
             factoryNight.Id,
@@ -299,7 +299,7 @@ public class Mod(
                     {
                         item = items[objective.Target.Item!];
                     }
-                    if (!(item.Properties!.QuestItem == true)
+                    if ((item.Properties!.QuestItem != true)
                         && !Constants.KeyClasses.Contains(item.Parent)
                         && !Constants.HandoverCountItemBlacklist.Contains(item.Id))
                     {
@@ -330,7 +330,7 @@ public class Mod(
                                 {
                                     zoneCond.Zones = null;
                                     zoneCond.ConditionType = "Location";
-                                    zoneCond.Target = new ListOrT<string>([loc.Id], default);
+                                    zoneCond.Target = new ListOrT<string>([loc.Id], null);
                                 }
                                 // already replaced, support Factory and Ground Zero variants
                                 else
@@ -375,7 +375,7 @@ public class Mod(
                     if (remove.Target)
                     {
                         condition.SavageRole?.Clear();
-                        condition.Target = new ListOrT<string>(default, "Any");
+                        condition.Target = new ListOrT<string>(null, "Any");
                     }
 
                     if (remove.Weapon)
@@ -432,7 +432,7 @@ public class Mod(
             return;
         }
 
-        var questConfig = _configServer.GetConfig<QuestConfig>();
+        var questConfig = configServer.GetConfig<QuestConfig>();
 
         foreach (var quest in questConfig.RepeatableQuests)
         {
@@ -445,6 +445,7 @@ public class Mod(
             }
 
             var elims = quest.QuestConfig.Elimination;
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (elims is null)
             {
                 continue;
@@ -483,21 +484,21 @@ public class Mod(
         }
     }
 
-    protected bool LoadConfig()
+    private bool LoadConfig()
     {
         try
         {
-            _config = _json.DeserializeFromFile<Config>(Path.Join(_modDir, "config.json"));
+            _config = json.DeserializeFromFile<Config>(Path.Join(_modDir, "config.json"));
         }
         catch (JsonException)
         {
-            _logger.Error("Invalid config.");
+            logger.Error("Invalid config.");
             return false;
         }
 
         if (_config is null)
         {
-            _logger.Error("Missing config.");
+            logger.Error("Missing config.");
             return false;
         }
 
@@ -511,19 +512,19 @@ public class Mod(
             return Task.CompletedTask;
         }
 
-        var quests = _db.GetQuests();
+        var quests = db.GetQuests();
         ModifyQuests(quests);
 
 #if DEBUG
         // Dump modified quest database to a file for quick inspection in debug builds.
         var dumpFile = Path.Join(_modDir, "dump.json");
-        File.WriteAllText(dumpFile, _json.Serialize(quests, true));
+        File.WriteAllText(dumpFile, json.Serialize(quests, true));
 #endif
 
         return Task.CompletedTask;
     }
 
-    private double? GetNewObjectiveValue(double? original, int absolute, int percent)
+    private static double? GetNewObjectiveValue(double? original, int absolute, int percent)
     {
         if (original is null)
         {
