@@ -41,7 +41,7 @@ public record Constants
 
 public record LocationInfo(string Name, string Id, string MongoId);
 
-[Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 1)]
+[Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 999)]
 public class Mod(
     ISptLogger<Mod> _logger,
     DatabaseService _db,
