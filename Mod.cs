@@ -12,6 +12,7 @@ using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
 using SPTarkov.Server.Core.Utils.Collections;
 using SPTarkov.Server.Core.Utils.Json;
+using Path = System.IO.Path;
 
 
 namespace sgtlaggyQuestTweaks;
@@ -51,7 +52,7 @@ public class Mod(
 ) : IOnLoad
 {
     protected Config? _config;
-    protected string _modDir = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+    protected string _modDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 
     public void ModifyQuests(Dictionary<MongoId, Quest> quests)
     {
@@ -485,7 +486,7 @@ public class Mod(
     {
         try
         {
-            _config = _json.DeserializeFromFile<Config>(System.IO.Path.Join(_modDir, "config.json"));
+            _config = _json.DeserializeFromFile<Config>(Path.Join(_modDir, "config.json"));
         }
         catch (JsonException)
         {
@@ -514,7 +515,7 @@ public class Mod(
 
 #if DEBUG
         // Dump modified quest database to a file for quick inspection in debug builds.
-        var dumpFile = System.IO.Path.Join(_modDir, "dump.json");
+        var dumpFile = Path.Join(_modDir, "dump.json");
         File.WriteAllText(dumpFile, _json.Serialize(quests, true));
 #endif
 
