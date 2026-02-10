@@ -80,10 +80,11 @@ public class Mod(
                     );
                 }
             )
-            .Where(info => (info is not null));
+            .Where(info => (info is not null))
+            .ToList();
         // special-case factory night because it’s not enabled and name in locale is "Night Factory"
         var factoryNight = _db.GetLocation(ELocationName.factory4_night.ToString())!.Base;
-        locations.Append(new LocationInfo(
+        locations.Add(new LocationInfo(
             "Factory",
             factoryNight.Id,
             factoryNight.IdField
