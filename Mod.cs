@@ -335,7 +335,7 @@ public class Mod(
                                 // already replaced, support Factory and Ground Zero variants
                                 else
                                 {
-                                    zoneCond.Target!.List!.Append(loc.Id);
+                                    zoneCond.Target!.List!.Add(loc.Id);
                                 }
                             }
                         }
