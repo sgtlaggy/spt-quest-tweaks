@@ -54,42 +54,8 @@ public class Mod(
     private Config? _config;
     private readonly string _modDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 
-    private void ModifyQuests(Dictionary<MongoId, Quest> quests)
+    private void ModifySpecialCaseQuests(Dictionary<MongoId, Quest> quests)
     {
-        var items = db.GetItems();
-        var enLocale = db.GetLocales().Global["en"].Value!;
-
-        var locations = db.GetLocations().GetDictionary().Values
-            .Where(loc => loc.Base?.Enabled ?? false)
-            .Select(
-                (loc) =>
-                {
-                    string? name;
-                    if (!enLocale.TryGetValue(loc.Base.Id, out name))
-                    {
-                        if (!enLocale.TryGetValue($"{loc.Base.IdField} Name", out name))
-                        {
-                            return null;
-                        }
-                    }
-                    return new LocationInfo(
-                        // Terminal/Lab are undefined using ‘.Id’, need to get "proper" name
-                        name,
-                        loc.Base.Id,
-                        loc.Base.IdField
-                    );
-                }
-            )
-            .Where(info => (info is not null))
-            .ToList();
-        // special-case factory night because it’s not enabled and name in locale is "Night Factory"
-        var factoryNight = db.GetLocation(nameof(ELocationName.factory4_night))!.Base;
-        locations.Add(new LocationInfo(
-            "Factory",
-            factoryNight.Id,
-            factoryNight.IdField
-        ));
-
         if (_config!.LightkeeperOnlyRequireLevel > 0)
         {
             var conditions = quests[QuestTpl.NETWORK_PROVIDER_PART_1].Conditions.AvailableForStart!;
@@ -133,8 +99,45 @@ public class Mod(
                 }
             }
         }
+    }
 
-        var remove = _config.RemoveConditions;
+    private void ModifyQuests(Dictionary<MongoId, Quest> quests)
+    {
+        var items = db.GetItems();
+        var enLocale = db.GetLocales().Global["en"].Value!;
+
+        var locations = db.GetLocations().GetDictionary().Values
+            .Where(loc => loc.Base?.Enabled ?? false)
+            .Select(
+                (loc) =>
+                {
+                    string? name;
+                    if (!enLocale.TryGetValue(loc.Base.Id, out name))
+                    {
+                        if (!enLocale.TryGetValue($"{loc.Base.IdField} Name", out name))
+                        {
+                            return null;
+                        }
+                    }
+                    return new LocationInfo(
+                        // Terminal/Lab are undefined using ‘.Id’, need to get "proper" name
+                        name,
+                        loc.Base.Id,
+                        loc.Base.IdField
+                    );
+                }
+            )
+            .Where(info => (info is not null))
+            .ToList();
+        // special-case factory night because it’s not enabled and name in locale is "Night Factory"
+        var factoryNight = db.GetLocation(nameof(ELocationName.factory4_night))!.Base;
+        locations.Add(new LocationInfo(
+            "Factory",
+            factoryNight.Id,
+            factoryNight.IdField
+        ));
+        
+        var remove = _config!.RemoveConditions;
         var shouldModifyConditions = remove.AnyEnabled
                                      || _config.HandoverItemPercent >= 0
                                      || _config.EliminationPercent >= 0
@@ -417,6 +420,7 @@ public class Mod(
         }
 
         var quests = db.GetQuests();
+        ModifySpecialCaseQuests(quests);
         ModifyQuests(quests);
 
 #if DEBUG
