@@ -101,6 +101,51 @@ public class Mod(
         }
     }
 
+    private void ModifyQuestsNonExemptSettings(Dictionary<MongoId, Quest> quests)
+    {
+        if (!(_config!.RevealAllQuestObjectives
+              || _config.RevealUnknownRewards
+              || _config.RemoveTimeGates))
+        {
+            return;
+        }
+        
+        foreach (var quest in quests.Values)
+        {
+            var objectives = quest.Conditions.AvailableForFinish!;
+
+            if (_config!.RevealAllQuestObjectives)
+            {
+                foreach (var objective in objectives)
+                {
+                    objective.VisibilityConditions?.Clear();
+                }
+            }
+
+            if (_config.RevealUnknownRewards)
+            {
+                if (quest.Rewards is not null)
+                {
+                    foreach (var reward in quest.Rewards["Success"])
+                    {
+                        reward.Unknown = false;
+                    }
+                }
+            }
+
+            if (_config.RemoveTimeGates)
+            {
+                foreach (var prereq in quest.Conditions.AvailableForStart!)
+                {
+                    if (prereq.AvailableAfter is not null)
+                    {
+                        prereq.AvailableAfter = 0;
+                    }
+                }
+            }
+        }
+    }
+
     private void ModifyQuests(Dictionary<MongoId, Quest> quests)
     {
         var items = db.GetItems();
@@ -147,36 +192,6 @@ public class Mod(
         foreach (var quest in quests.Values)
         {
             var objectives = quest.Conditions.AvailableForFinish!;
-
-            if (_config.RevealAllQuestObjectives)
-            {
-                foreach (var objective in objectives)
-                {
-                    objective.VisibilityConditions?.Clear();
-                }
-            }
-
-            if (_config.RevealUnknownRewards)
-            {
-                if (quest.Rewards is not null)
-                {
-                    foreach (var reward in quest.Rewards["Success"])
-                    {
-                        reward.Unknown = false;
-                    }
-                }
-            }
-
-            if (_config.RemoveTimeGates)
-            {
-                foreach (var prereq in quest.Conditions.AvailableForStart!)
-                {
-                    if (prereq.AvailableAfter is not null)
-                    {
-                        prereq.AvailableAfter = 0;
-                    }
-                }
-            }
 
             if (_config.ExemptQuests.Contains(quest.Id))
             {
@@ -421,6 +436,7 @@ public class Mod(
 
         var quests = db.GetQuests();
         ModifySpecialCaseQuests(quests);
+        ModifyQuestsNonExemptSettings(quests);
         ModifyQuests(quests);
 
 #if DEBUG
