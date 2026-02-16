@@ -90,102 +90,8 @@ public class Mod(
             factoryNight.IdField
         ));
 
-        // if (_config.RevealAllQuestObjectives)
-        // {
-        //     _logger.Info("Revealing hidden/conditional objectives.");
-        // }
-
-        // if (_config.RevealUnknownRewards)
-        // {
-        //     _logger.Info("Revealing unknown rewards.");
-        // }
-
-        // if (_config.RemoveTimeGates)
-        // {
-        //     _logger.Info("Removing time gates from all quests.");
-        // }
-
-        // if (_config.RemoveConditions.Target)
-        // {
-        //     _logger.Info("Removing target restrictions from elimination requirements.");
-        // }
-
-        // if (_config.RemoveConditions.Weapon)
-        // {
-        //     _logger.Info("Removing weapon/caliber restrictions from elimination requirements.");
-        // }
-
-        // if (_config.RemoveConditions.WeaponMods)
-        // {
-        //     _logger.Info("Removing weapon mod restrictions from elimination requirements.");
-        // }
-
-        // if (_config.RemoveConditions.SelfGear)
-        // {
-        //     _logger.Info("Removing equipment restrictions from elimination requirements.");
-        // }
-
-        // if (_config.RemoveConditions.EnemyGear)
-        // {
-        //     _logger.Info("Removing enemy equipment restrictions from elimination requirements.");
-        // }
-
-        // if (_config.RemoveConditions.SelfHealthEffect)
-        // {
-        //     _logger.Info("Removing status effects from elimination requirements.");
-        // }
-
-        // if (_config.RemoveConditions.EnemyHealthEffect)
-        // {
-        //     _logger.Info("Removing enemy status effects from elimination requirements.");
-        // }
-
-        // if (_config.RemoveConditions.BodyPart)
-        // {
-        //     _logger.Info("Removing body part elimniation requirement.");
-        // }
-
-        // if (_config.RemoveConditions.Distance)
-        // {
-        //     _logger.Info("Removing distance elimniation requirement.");
-        // }
-
-        // if (_config.RemoveConditions.Time)
-        // {
-        //     _logger.Info("Removing time from elimniation requirement.");
-        // }
-
-        // if (_config.RemoveConditions.Zone && _config.RemoveConditions.Map)
-        // {
-        //     _logger.Info("Removing zone and map elimination requirements.");
-        // }
-        // else if (_config.RemoveConditions.Zone)
-        // {
-        //     _logger.Info("Replacing zone elimination requirements with location.");
-        // }
-        // else if (_config.RemoveConditions.Map)
-        // {
-        //     _logger.Info("Removing map objective requirements.");
-        // }
-
-        // if (_config.RemoveConditions.FindInRaid)
-        // {
-        //     _logger.Info("Removing found in raid requirement for item hand-ins.");
-        // }
-
-        // if (_config.HandoverItemCount >= 0)
-        // {
-        //     _logger.Info($"Setting required number of items for hand-over to {_config.HandoverItemCount}.");
-        // }
-
-        // if (_config.EliminationCount >= 0)
-        // {
-        //     _logger.Info($"Setting required number of eliminations to {_config.EliminationCount}.");
-        // }
-
         if (_config!.LightkeeperOnlyRequireLevel > 0)
         {
-            // _logger.Info($"Removing Network Provider Part 1 prerequisites, making it available at level {_config.LightkeeperOnlyRequireLevel}.");
             var conditions = quests[QuestTpl.NETWORK_PROVIDER_PART_1].Conditions.AvailableForStart!;
             var reuseId = conditions[0].Id;
             conditions.Clear();
@@ -205,8 +111,6 @@ public class Mod(
 
         if (_config.TarkovShooterM10)
         {
-            // _logger.Info("Adding Sako TRG M10 to old Tarkov Shooter quests.");
-
             foreach (var questId in Constants.TarkovShooter)
             {
                 var conditions = quests[questId].Conditions.AvailableForFinish!;
