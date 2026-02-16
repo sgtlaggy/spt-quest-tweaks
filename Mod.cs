@@ -114,7 +114,7 @@ public class Mod(
         {
             var objectives = quest.Conditions.AvailableForFinish!;
 
-            if (_config!.RevealAllQuestObjectives)
+            if (_config.RevealAllQuestObjectives)
             {
                 foreach (var objective in objectives)
                 {
@@ -146,8 +146,19 @@ public class Mod(
         }
     }
 
-    private void ModifyQuests(Dictionary<MongoId, Quest> quests)
+    private void ModifyQuestConditions(Dictionary<MongoId, Quest> quests)
     {
+        var remove = _config!.RemoveConditions;
+        var shouldModifyConditions = remove.AnyEnabled
+                                     || _config.HandoverItemPercent >= 0
+                                     || _config.EliminationPercent >= 0
+                                     || _config.HandoverItemCount >= 0
+                                     || _config.EliminationCount >= 0;
+        if (!shouldModifyConditions)
+        {
+            return;
+        }
+        
         var items = db.GetItems();
         var enLocale = db.GetLocales().Global["en"].Value!;
 
@@ -181,28 +192,11 @@ public class Mod(
             factoryNight.Id,
             factoryNight.IdField
         ));
-        
-        var remove = _config!.RemoveConditions;
-        var shouldModifyConditions = remove.AnyEnabled
-                                     || _config.HandoverItemPercent >= 0
-                                     || _config.EliminationPercent >= 0
-                                     || _config.HandoverItemCount >= 0
-                                     || _config.EliminationCount >= 0;
 
         foreach (var quest in quests.Values)
         {
             var objectives = quest.Conditions.AvailableForFinish!;
-
-            if (_config.ExemptQuests.Contains(quest.Id))
-            {
-                continue;
-            }
-
-            if (!shouldModifyConditions)
-            {
-                continue;
-            }
-
+            
             foreach (var objective in objectives)
             {
                 if (objective.ConditionType == "HandoverItem" || objective.ConditionType == "FindItem")
@@ -349,7 +343,7 @@ public class Mod(
             }
         }
 
-        if (!(shouldModifyConditions && _config.AffectRepeatables))
+        if (!_config.AffectRepeatables)
         {
             return;
         }
@@ -434,15 +428,22 @@ public class Mod(
             return Task.CompletedTask;
         }
 
-        var quests = db.GetQuests();
-        ModifySpecialCaseQuests(quests);
-        ModifyQuestsNonExemptSettings(quests);
-        ModifyQuests(quests);
+        var allQuests = db.GetQuests();
+        ModifySpecialCaseQuests(allQuests);
+        ModifyQuestsNonExemptSettings(allQuests);
+        
+        var questsToModify = allQuests;
+        if (_config!.ExemptQuests.Count > 0)
+        {
+            questsToModify = questsToModify.Where(kvp => !_config.ExemptQuests.Contains(kvp.Key)).ToDictionary();
+        }
+        
+        ModifyQuestConditions(questsToModify);
 
 #if DEBUG
         // Dump modified quest database to a file for quick inspection in debug builds.
         var dumpFile = Path.Join(_modDir, "dump.json");
-        File.WriteAllText(dumpFile, json.Serialize(quests, true));
+        File.WriteAllText(dumpFile, json.Serialize(allQuests, true));
 #endif
 
         return Task.CompletedTask;
