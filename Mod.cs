@@ -433,7 +433,10 @@ public class Mod(
         ModifyQuestsNonExemptSettings(allQuests);
         
         var questsToModify = allQuests;
-        if (_config!.ExemptQuests.Count > 0)
+        if (_config!.OnlyQuests.Count > 0)
+        {
+            questsToModify = questsToModify.Where(kvp => _config.OnlyQuests.Contains(kvp.Key)).ToDictionary();
+        } else if (_config.ExemptQuests.Count > 0)
         {
             questsToModify = questsToModify.Where(kvp => !_config.ExemptQuests.Contains(kvp.Key)).ToDictionary();
         }

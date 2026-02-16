@@ -34,6 +34,9 @@ public record Config
 
     [JsonPropertyName("exemptQuests")]
     public required HashSet<string> ExemptQuests { get; set; }
+    
+    [JsonPropertyName("onlyQuests")]
+    public required HashSet<string> OnlyQuests { get; set; }
 
     [JsonPropertyName("lightkeeperOnlyRequireLevel")]
     public int LightkeeperOnlyRequireLevel { get; set; }

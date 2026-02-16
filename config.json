@@ -24,6 +24,7 @@
     "eliminationPercent": -1,
     "affectRepeatables": true,
     "exemptQuests": [],
+    "onlyQuests": [],
 
     "lightkeeperOnlyRequireLevel": 0,
     "tarkovShooterM10": false
