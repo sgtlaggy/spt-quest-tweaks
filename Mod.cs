@@ -54,6 +54,39 @@ public class Mod(
     private Config? _config;
     private readonly string _modDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
 
+    public Task OnLoad()
+    {
+        LoadConfig();
+        if (_config is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var allQuests = db.GetQuests();
+        ModifySpecialCaseQuests(allQuests);
+        ModifyQuestsNonExemptSettings(allQuests);
+
+        var questsToModify = allQuests;
+        if (_config.OnlyQuests.Count > 0)
+        {
+            questsToModify = allQuests.Where(kvp => _config.OnlyQuests.Contains(kvp.Key)).ToDictionary();
+        }
+        else if (_config.ExemptQuests.Count > 0)
+        {
+            questsToModify = allQuests.Where(kvp => !_config.ExemptQuests.Contains(kvp.Key)).ToDictionary();
+        }
+
+        ModifyQuestConditions(questsToModify);
+
+#if DEBUG
+        // Dump modified quest database to a file for quick inspection in debug builds.
+        var dumpFile = Path.Join(_modDir, "dump.json");
+        File.WriteAllText(dumpFile, json.Serialize(allQuests, true));
+#endif
+
+        return Task.CompletedTask;
+    }
+
     private void ModifySpecialCaseQuests(Dictionary<MongoId, Quest> quests)
     {
         if (_config!.LightkeeperOnlyRequireLevel > 0)
@@ -109,7 +142,7 @@ public class Mod(
         {
             return;
         }
-        
+
         foreach (var quest in quests.Values)
         {
             var objectives = quest.Conditions.AvailableForFinish!;
@@ -158,7 +191,7 @@ public class Mod(
         {
             return;
         }
-        
+
         var items = db.GetItems();
         var enLocale = db.GetLocales().Global["en"].Value!;
 
@@ -196,7 +229,7 @@ public class Mod(
         foreach (var quest in quests.Values)
         {
             var objectives = quest.Conditions.AvailableForFinish!;
-            
+
             foreach (var objective in objectives)
             {
                 if (objective.ConditionType == "HandoverItem" || objective.ConditionType == "FindItem")
@@ -400,58 +433,6 @@ public class Mod(
         }
     }
 
-    private bool LoadConfig()
-    {
-        try
-        {
-            _config = json.DeserializeFromFile<Config>(Path.Join(_modDir, "config.json"));
-        }
-        catch (JsonException)
-        {
-            logger.Error("Invalid config.");
-            return false;
-        }
-
-        if (_config is null)
-        {
-            logger.Error("Missing config.");
-            return false;
-        }
-
-        return true;
-    }
-    
-    public Task OnLoad()
-    {
-        if (!LoadConfig())
-        {
-            return Task.CompletedTask;
-        }
-
-        var allQuests = db.GetQuests();
-        ModifySpecialCaseQuests(allQuests);
-        ModifyQuestsNonExemptSettings(allQuests);
-        
-        var questsToModify = allQuests;
-        if (_config!.OnlyQuests.Count > 0)
-        {
-            questsToModify = questsToModify.Where(kvp => _config.OnlyQuests.Contains(kvp.Key)).ToDictionary();
-        } else if (_config.ExemptQuests.Count > 0)
-        {
-            questsToModify = questsToModify.Where(kvp => !_config.ExemptQuests.Contains(kvp.Key)).ToDictionary();
-        }
-        
-        ModifyQuestConditions(questsToModify);
-
-#if DEBUG
-        // Dump modified quest database to a file for quick inspection in debug builds.
-        var dumpFile = Path.Join(_modDir, "dump.json");
-        File.WriteAllText(dumpFile, json.Serialize(allQuests, true));
-#endif
-
-        return Task.CompletedTask;
-    }
-
     private static double? GetNewObjectiveValue(double? original, int absolute, int percent)
     {
         if (original is null)
@@ -478,5 +459,26 @@ public class Mod(
         }
 
         return original;
+    }
+
+    private void LoadConfig()
+    {
+        try
+        {
+            _config = json.DeserializeFromFile<Config>(Path.Join(_modDir, "config.json"));
+        }
+        catch (JsonException)
+        {
+            logger.Error("Invalid config.");
+            return;
+        }
+
+        if (_config is null)
+        {
+            logger.Error("Missing config.");
+            return;
+        }
+
+        return;
     }
 }

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using SPTarkov.Server.Core.Models.Common;
 
 
 namespace sgtlaggyQuestTweaks;
@@ -33,10 +34,10 @@ public record Config
     public bool AffectRepeatables { get; set; }
 
     [JsonPropertyName("exemptQuests")]
-    public required HashSet<string> ExemptQuests { get; set; }
-    
+    public required HashSet<MongoId> ExemptQuests { get; set; }
+
     [JsonPropertyName("onlyQuests")]
-    public required HashSet<string> OnlyQuests { get; set; }
+    public required HashSet<MongoId> OnlyQuests { get; set; }
 
     [JsonPropertyName("lightkeeperOnlyRequireLevel")]
     public int LightkeeperOnlyRequireLevel { get; set; }
