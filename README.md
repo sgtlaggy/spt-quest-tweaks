@@ -43,7 +43,7 @@ Any marked with 🔃 also will also apply to repeatable quests by defaults.
 
 An additional setting toggles whether these also apply to repeatable quests.
 
-The `exemptQuests` setting lets you specify a list of quests conditions will *not* be removed from. This should be a list of quest IDs, which can be found by searching the quest name in `SPT_Data/Server/database/locales/global/en.json` and looking for a matching line starting with `"<QUEST ID> name"`. For example, the ID of the dehydration quest "The Survivalist Path - Zhivchik" is `5d25bfd086f77442734d3007`. This can be added to the list like `["5d25bfd086f77442734d3007"]`. To add multiple quests, add a comma between ids like `["...", "..."]`.
+The `exemptQuests` setting lets you specify a list of quests conditions will *not* be removed from. This should be a list of quest IDs, which can be found using [Tarkynator](https://tarkynator.com/quests?scope=global). For example, the ID of the dehydration quest "The Survivalist Path - Zhivchik" is `5d25bfd086f77442734d3007`. This can be added to the list like `["5d25bfd086f77442734d3007"]`. To add multiple quests, add a comma between ids like `["...", "..."]`.
 Modded quests can also be added. Their quest IDs can be found in some file in their own mod folder in `user/mods` or, if they use VCQL, `user/mods/Virtual's Custom Quest Loader/database/locales/en/THAT_MOD.json`.
 
 ### Set Number For Eliminations and Items to Hand Over
