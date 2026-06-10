@@ -239,16 +239,18 @@ public class Mod(
                         objective.OnlyFoundInRaid = false;
                     }
 
-                    TemplateItem item;
+                    TemplateItem? item;
                     if (objective.Target!.IsList)
                     {
-                        item = items[objective.Target.List![0]];
+                        items.TryGetValue(objective.Target.List![0], out item);
                     }
                     else
                     {
-                        item = items[objective.Target.Item!];
+                        items.TryGetValue(objective.Target.Item!, out item);
                     }
-                    if ((item.Properties!.QuestItem != true)
+
+                    if ((item is not null)
+                        && (item.Properties!.QuestItem != true)
                         && !Constants.KeyClasses.Contains(item.Parent)
                         && !Constants.HandoverCountItemBlacklist.Contains(item.Id))
                     {
