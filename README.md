@@ -27,7 +27,7 @@ Remove waiting periods after some quests like Gunsmith.
 ℹ️ This is similar to [kiki-RemoveTediousQuestConditions](https://forge.sp-tarkov.com/mod/336/kiki-removetediousquestconditions).
 
 The following objective conditions can be removed.
-Any marked with 🔃 also will also apply to repeatable quests by defaults.
+Any marked with 🔃 also will also apply to repeatable quests by default.
 
 - 🔃 Elimination target (PMC, scav, boss, etc)
 - 🔃 Weapon and mods
