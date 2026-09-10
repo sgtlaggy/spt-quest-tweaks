@@ -57,7 +57,7 @@ The item setting does not apply to quest items like the Bronze Pocket Watch or k
 
 Each of these options can be overridden for individual quests using the `questOverrides` setting.
 It should be in the format `{"questId": {"option": true, "otherOption": false}}`, using the option names in `removeConditions` for reference. These will always be handled regardless of `onlyQuests` and `exemptQuests`.
-As an example, to backport the expansion of [Forester's Duty](https://escapefromtarkov.fandom.com/wiki/Forester%27s_Duty), you could set `{"66ab9da7eb102b9bcd08591c": {"zone": true}}` and this would leave other zones like Capturing Outposts intact.
+As an example, to backport the expansion of [Forester's Duty](https://escapefromtarkov.fandom.com/wiki/Forester%27s_Duty), you could set `{"66ab9da7eb102b9bcd08591c": {"removeZone": true}}` and this would leave other zones like Capturing Outposts intact.
 The `onlyQuests` setting lets you specify an exclusive list of quests that will be modified.
 The `exemptQuests` setting lets you specify a list of quests that will be skipped entirely.
 
