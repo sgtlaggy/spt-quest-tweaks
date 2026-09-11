@@ -36,6 +36,19 @@ public record Config
     [JsonPropertyName("debug")]
     public bool Debug { get; set; } = false;
 
+    public void FillDefaultGlobalConditions()
+    {
+        var conditionProps = typeof(ConditionsConfig).GetProperties()
+            .Where((prop) => (prop.GetCustomAttribute(typeof(JsonPropertyNameAttribute)) is not null));
+        foreach (var prop in conditionProps)
+        {
+            if (prop.GetValue(GlobalConditions) is null)
+            {
+                prop.SetValue(GlobalConditions, GetDefaultValue(prop));
+            }
+        }
+    }
+
     public bool IsQuestExempt(MongoId questId)
     {
         if ((OnlyQuests.Count > 0) && !OnlyQuests.Contains(questId))
@@ -246,6 +259,9 @@ public record SpecialCasesConfig
 [Injectable(TypePriority = OnLoadOrder.Preload + 1)]
 public class ConfigRegistration(ISptLogger<ConfigRegistration> logger) : IOnDIConstruct, IOnLoad
 {
+    private static string ModDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+    public static string FilePath = Path.Join(ModDir, "config.json");
+
     private static Exception? Error = default;
 
     public static async Task OnDIConstructAsync(
@@ -253,26 +269,38 @@ public class ConfigRegistration(ISptLogger<ConfigRegistration> logger) : IOnDICo
         CancellationToken cancellationToken
     )
     {
-        var modDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
         var jsonSerializerOptions = new JsonSerializerOptions()
         {
             ReadCommentHandling = JsonCommentHandling.Skip,
             AllowTrailingCommas = true,
-            Converters = { new StringToMongoIdConverter() }
+            Converters = { new StringToMongoIdConverter() },
+            WriteIndented = true,
         };
 
+        Config? config;
         try
         {
-            var configJson = await File.ReadAllTextAsync(Path.Join(modDir, "config.json"), cancellationToken);
-            var config = JsonSerializer.Deserialize<Config>(configJson, jsonSerializerOptions)!;
-            serviceCollection.AddSingleton(config);
+            var configJson = await File.ReadAllTextAsync(FilePath, cancellationToken);
+            config = JsonSerializer.Deserialize<Config>(configJson, jsonSerializerOptions);
+            if (config is null)
+            {
+                throw new FileNotFoundException("Loaded config is null.");
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            config = new();
+            config.FillDefaultGlobalConditions();
+            await File.WriteAllTextAsync(FilePath, JsonSerializer.Serialize(config, jsonSerializerOptions), cancellationToken);
         }
         catch (Exception e)
         {
+            config = new();
             Error = e;
-            serviceCollection.AddSingleton(new Config());
         }
+
+        config.FillDefaultGlobalConditions();
+        serviceCollection.AddSingleton(config);
     }
 
     public Task OnLoadAsync(CancellationToken cancellationToken)
@@ -297,7 +325,7 @@ public class ConfigEditorProvider(Config config, ModHelper modHelper) : IConfigE
             metadata.ModGuid,
             metadata.Name,
             config,
-            Path.Combine(modDir, "config.json")
+            ConfigRegistration.FilePath
         );
     }
 }

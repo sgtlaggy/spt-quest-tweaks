@@ -1,37 +1,37 @@
 {
-    "QualityOfLife": {
-        "revealAllQuestObjectives": false,
-        "revealUnknownRewards": false,
-        "removeTimeGates": false
-    },
-    "GlobalConditions": {
-        "removeTarget": false,
-        "removeWeapon": false,
-        "removeWeaponMods": false,
-        "removeSelfGear": false,
-        "removeEnemyGear": false,
-        "removeSelfHealthEffect": false,
-        "removeEnemyHealthEffect": false,
-        "removeBodyPart": false,
-        "removeDistance": false,
-        "removeTime": false,
-        "removeMap": false,
-        "removeZone": false,
-        "removeFindInRaid": false,
-        "removeInOneRaid": false,
-        "handoverItemCount": -1,
-        "handoverItemPercent": -1,
-        "eliminationCount": -1,
-        "eliminationPercent": -1,
-        "affectRepeatables": true
-    },
-    "SpecialCases": {
-        "lightkeeperOnlyRequireLevel": 0,
-        "tarkovShooterM10": false,
-        "collectorPrerequisiteBackport": false
-    },
-    "exemptQuests": [],
-    "onlyQuests": [],
-    "questOverrides": {},
-    "debug": false
+  "QualityOfLife": {
+    "revealAllQuestObjectives": false,
+    "revealUnknownRewards": false,
+    "removeTimeGates": false
+  },
+  "GlobalConditions": {
+    "affectRepeatables": true,
+    "removeTarget": false,
+    "removeWeapon": false,
+    "removeWeaponMods": false,
+    "removeSelfGear": false,
+    "removeEnemyGear": false,
+    "removeSelfHealthEffect": false,
+    "removeEnemyHealthEffect": false,
+    "removeBodyPart": false,
+    "removeDistance": false,
+    "removeTime": false,
+    "removeMap": false,
+    "removeZone": false,
+    "removeFindInRaid": false,
+    "removeInOneRaid": false,
+    "handoverItemCount": -1,
+    "handoverItemPercent": -1,
+    "eliminationCount": -1,
+    "eliminationPercent": -1
+  },
+  "SpecialCases": {
+    "lightkeeperOnlyRequireLevel": 0,
+    "tarkovShooterM10": false,
+    "collectorPrerequisiteBackport": false
+  },
+  "exemptQuests": [],
+  "onlyQuests": [],
+  "questOverrides": {},
+  "debug": false
 }
