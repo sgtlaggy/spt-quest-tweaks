@@ -32,5 +32,6 @@
     },
     "exemptQuests": [],
     "onlyQuests": [],
-    "questOverrides": {}
+    "questOverrides": {},
+    "debug": false
 }

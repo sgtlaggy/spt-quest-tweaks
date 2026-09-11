@@ -43,9 +43,7 @@ public record LocationInfo(string Name, string Id, string MongoId);
 
 [Injectable(TypePriority = OnLoadOrder.PostLoad + 999)]
 public class Mod(
-#if DEBUG
     JsonUtil json,
-#endif
     Config config,
     QuestConfig questConfig,
     TemplateTable templates,
@@ -62,6 +60,12 @@ public class Mod(
     {
         var allQuests = templates.Quests;
 
+        if (config.Debug)
+        {
+            var filename = Path.Join(_modDir, "quests_before.json");
+            File.WriteAllText(filename, json.Serialize(allQuests, true));
+        }
+
         try
         {
             ModifySpecialCaseQuests(allQuests);
@@ -73,11 +77,11 @@ public class Mod(
             logger.Error($"[QuestTweaks] Error modifying quests.", e);
         }
 
-#if DEBUG
-        // Dump modified quest database to a file for quick inspection in debug builds.
-        var dumpFile = Path.Join(_modDir, "dump.json");
-        File.WriteAllText(dumpFile, json.Serialize(allQuests, true));
-#endif
+        if (config.Debug)
+        {
+            var filename = Path.Join(_modDir, "quests_after.json");
+            File.WriteAllText(filename, json.Serialize(allQuests, true));
+        }
 
         return Task.CompletedTask;
     }

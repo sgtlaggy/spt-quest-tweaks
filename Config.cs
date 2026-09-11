@@ -33,6 +33,9 @@ public record Config
     [JsonPropertyName("questOverrides")]
     public Dictionary<MongoId, ConditionsConfig> QuestOverrides { get; set; } = [];
 
+    [JsonPropertyName("debug")]
+    public bool Debug { get; set; } = false;
+
     public bool IsQuestExempt(MongoId questId)
     {
         if ((OnlyQuests.Count > 0) && !OnlyQuests.Contains(questId))
