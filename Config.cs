@@ -31,6 +31,114 @@ public record Config
 
     [JsonPropertyName("questOverrides")]
     public required Dictionary<MongoId, ConditionsConfig> QuestOverrides { get; set; }
+
+    public bool IsQuestExempt(MongoId questId)
+    {
+        if ((OnlyQuests.Count > 0) && !OnlyQuests.Contains(questId))
+        {
+            return true;
+        }
+        if (ExemptQuests.Contains(questId))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public bool ShouldModifyCondition(MongoId questId, string condition)
+    {
+        var prop = typeof(ConditionsConfig).GetProperty(condition)!;
+
+        ConditionsConfig? questOverride;
+        if (QuestOverrides.TryGetValue(questId, out questOverride))
+        {
+            var overrideValue = prop.GetValue(questOverride) as bool?;
+            if (overrideValue is not null)
+            {
+                return overrideValue.Value;
+            }
+        }
+
+        if (IsQuestExempt(questId))
+        {
+            return false;
+        }
+
+        return (prop.GetValue(GlobalConditions) as bool?) ?? false;
+    }
+
+    public double? GetNewObjectiveValue(MongoId questId, string condition, double? original)
+    {
+        if (original is null)
+        {
+            return null;
+        }
+
+        var absoluteProp = typeof(ConditionsConfig).GetProperty($"{condition}Count")!;
+        var percentProp = typeof(ConditionsConfig).GetProperty($"{condition}Percent")!;
+
+        int? absolute;
+        int? percent;
+
+        ConditionsConfig? questOverride;
+        if (QuestOverrides.TryGetValue(questId, out questOverride))
+        {
+            absolute = absoluteProp.GetValue(questOverride) as int?;
+            if (absolute < 0)
+            {
+                return original;
+            }
+            else if (absolute >= 0)
+            {
+                return absolute;
+            }
+
+            percent = percentProp.GetValue(questOverride) as int?;
+            if (percent < 0)
+            {
+                return original;
+            }
+            else if (percent >= 0)
+            {
+                var value = Double.Round((original.Value * percent / 100).Value);
+                if (value == 0)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return value;
+                }
+            }
+        }
+
+        if (IsQuestExempt(questId))
+        {
+            return original;
+        }
+
+        absolute = absoluteProp.GetValue(GlobalConditions) as int?;
+        if (absolute >= 0)
+        {
+            return absolute;
+        }
+
+        percent = percentProp.GetValue(GlobalConditions) as int?;
+        if (percent >= 0)
+        {
+            var value = Double.Round((original.Value * percent / 100).Value);
+            if (value == 0)
+            {
+                return 1;
+            }
+            else
+            {
+                return value;
+            }
+        }
+
+        return original;
+    }
 }
 
 public record QualityOfLifeConfig
