@@ -332,7 +332,7 @@ public class Mod(
                         && !Constants.KeyClasses.Contains(item.Parent)
                         && !Constants.HandoverCountItemBlacklist.Contains(item.Id))
                     {
-                        objective.Value = config.GetNewObjectiveValue(questId, "HandoverItem", objective.Value);
+                        objective.Value = config.GetNewObjectiveValue(conditions, "HandoverItem", objective.Value);
                     }
                 }
 
@@ -397,7 +397,7 @@ public class Mod(
 
                     if (condition.ConditionType == "Kills")
                     {
-                        objective.Value = config.GetNewObjectiveValue(questId, "Elimination", objective.Value);
+                        objective.Value = config.GetNewObjectiveValue(conditions, "Elimination", objective.Value);
                     }
 
                     if (conditions.RemoveTarget!.Value)

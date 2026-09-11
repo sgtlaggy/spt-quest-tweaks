@@ -92,7 +92,7 @@ public record Config
         return null;
     }
 
-    public double? GetNewObjectiveValue(MongoId questId, string condition, double? original)
+    public double? GetNewObjectiveValue(ConditionsConfig config, string condition, double? original)
     {
         if (original is null)
         {
@@ -105,50 +105,13 @@ public record Config
         int? absolute;
         int? percent;
 
-        ConditionsConfig? questOverride;
-        if (QuestOverrides.TryGetValue(questId, out questOverride))
-        {
-            absolute = absoluteProp.GetValue(questOverride) as int?;
-            if (absolute < 0)
-            {
-                return original;
-            }
-            else if (absolute >= 0)
-            {
-                return absolute;
-            }
-
-            percent = percentProp.GetValue(questOverride) as int?;
-            if (percent < 0)
-            {
-                return original;
-            }
-            else if (percent >= 0)
-            {
-                var value = Double.Round((original.Value * percent / 100).Value);
-                if (value == 0)
-                {
-                    return 1;
-                }
-                else
-                {
-                    return value;
-                }
-            }
-        }
-
-        if (IsQuestExempt(questId))
-        {
-            return original;
-        }
-
-        absolute = absoluteProp.GetValue(GlobalConditions) as int?;
+        absolute = absoluteProp.GetValue(config) as int?;
         if (absolute >= 0)
         {
             return absolute;
         }
 
-        percent = percentProp.GetValue(GlobalConditions) as int?;
+        percent = percentProp.GetValue(config) as int?;
         if (percent >= 0)
         {
             var value = Double.Round((original.Value * percent / 100).Value);
