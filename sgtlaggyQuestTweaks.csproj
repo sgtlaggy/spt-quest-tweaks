@@ -20,10 +20,15 @@
   </PropertyGroup>
 
   <Target Name="BuildDist" AfterTargets="AfterBuild">
+    <ItemGroup>
+      <OutputDLL Include="$(TargetPath)"/>
+      <Resources Include="Resources\**\*.*"/>
+    </ItemGroup>
+
     <RemoveDir Directories="$(DistDir)"/>
     <Copy
-        SourceFiles="$(TargetPath);config.json;README.md"
-        DestinationFolder="$(ModDir)"/>
+        SourceFiles="@(OutputDLL);@(Resources)"
+        DestinationFolder="$(ModDir)\%(RecursiveDir)"/>
   </Target>
   <Target Name="CopyPDB" AfterTargets="BuildDist" Condition="'$(Configuration)' == 'Debug'">
     <Copy
