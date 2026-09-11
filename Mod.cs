@@ -304,6 +304,12 @@ public class Mod(
 
             foreach (var objective in objectives)
             {
+                if ((objective.OneSessionOnly ?? false)
+                    && ShouldModifyCondition(questId, "RemoveInOneRaid"))
+                {
+                    objective.OneSessionOnly = false;
+                }
+
                 if (objective.ConditionType == "HandoverItem" || objective.ConditionType == "FindItem")
                 {
                     if (ShouldModifyCondition(questId, "RemoveFindInRaid"))

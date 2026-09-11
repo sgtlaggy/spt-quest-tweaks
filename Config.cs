@@ -86,6 +86,9 @@ public record ConditionsConfig
     [JsonPropertyName("removeFindInRaid")]
     public bool? RemoveFindInRaid { get; set; }
 
+    [JsonPropertyName("removeInOneRaid")]
+    public bool? RemoveInOneRaid { get; set; }
+
     [JsonPropertyName("handoverItemCount")]
     public int? HandoverItemCount { get; set; }
 
@@ -114,6 +117,7 @@ public record ConditionsConfig
                || (RemoveMap ?? false)
                || (RemoveZone ?? false)
                || (RemoveFindInRaid ?? false)
+               || (RemoveInOneRaid ?? false)
                || (HandoverItemCount >= 0)
                || (HandoverItemPercent >= 0)
                || (EliminationCount >= 0)

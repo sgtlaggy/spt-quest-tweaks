@@ -18,6 +18,7 @@
         "removeMap": false,
         "removeZone": false,
         "removeFindInRaid": false,
+        "removeInOneRaid": false,
         "handoverItemCount": -1,
         "handoverItemPercent": -1,
         "eliminationCount": -1,

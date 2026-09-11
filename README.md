@@ -40,6 +40,7 @@ Any marked with 🔃 also will also apply to repeatable quests by default.
 - Zone
   - Removing zone but not map conditions will expand it to the map.
 - 🔃 Item found-in-raid status
+- In One Raid
 
 In overrides a value of `true` will remove the condition, `false` will keep the default condition, and `null` or omitting will use the global value.
 
