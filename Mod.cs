@@ -301,18 +301,18 @@ public class Mod(
         foreach (var (questId, quest) in quests)
         {
             var objectives = quest.Conditions.AvailableForFinish!;
+            var conditions = config.GetConditionsWithOverrides(questId);
 
             foreach (var objective in objectives)
             {
-                if ((objective.OneSessionOnly ?? false)
-                    && config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveInOneRaid)))
+                if ((objective.OneSessionOnly ?? false) && conditions.RemoveInOneRaid!.Value)
                 {
                     objective.OneSessionOnly = false;
                 }
 
                 if (objective.ConditionType == "HandoverItem" || objective.ConditionType == "FindItem")
                 {
-                    if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveFindInRaid)))
+                    if (conditions.RemoveFindInRaid!.Value)
                     {
                         objective.OnlyFoundInRaid = false;
                     }
@@ -341,7 +341,7 @@ public class Mod(
                     continue;
                 }
 
-                if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveZone)) && !config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveMap)))
+                if (conditions.RemoveZone!.Value && !conditions.RemoveMap!.Value)
                 {
                     var zoneCond = objective.Counter!.Conditions!.Find(
                         cond => cond.ConditionType == "InZone");
@@ -372,10 +372,10 @@ public class Mod(
                 }
 
                 objective.Counter!.Conditions!.RemoveAll(cond =>
-                    (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveSelfHealthEffect)) && (cond.ConditionType == "HealthEffect"))
-                    || (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveSelfGear)) && (cond.ConditionType == "Equipment"))
-                    || (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveMap)) && (cond.ConditionType == "Location"))
-                    || (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveZone)) && (cond.ConditionType == "InZone"))
+                    (conditions.RemoveSelfHealthEffect!.Value && (cond.ConditionType == "HealthEffect"))
+                    || (conditions.RemoveSelfGear!.Value && (cond.ConditionType == "Equipment"))
+                    || (conditions.RemoveMap!.Value && (cond.ConditionType == "Location"))
+                    || (conditions.RemoveZone!.Value && (cond.ConditionType == "InZone"))
                 );
 
                 // auto-complete counters that no longer have an "action" condition
@@ -395,47 +395,46 @@ public class Mod(
                         continue;
                     }
 
-                    if ((config.GlobalConditions.EliminationCount >= 0 || config.GlobalConditions.EliminationPercent >= 0)
-                        && condition.ConditionType == "Kills")
+                    if (condition.ConditionType == "Kills")
                     {
                         objective.Value = config.GetNewObjectiveValue(questId, "Elimination", objective.Value);
                     }
 
-                    if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveTarget)))
+                    if (conditions.RemoveTarget!.Value)
                     {
                         condition.SavageRole?.Clear();
                         condition.Target = new ListOrT<string>(null, "Any");
                     }
 
-                    if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveWeapon)))
+                    if (conditions.RemoveWeapon!.Value)
                     {
                         condition.Weapon?.Clear();
                         condition.WeaponCaliber?.Clear();
                     }
 
-                    if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveWeaponMods)))
+                    if (conditions.RemoveWeaponMods!.Value)
                     {
                         condition.WeaponModsExclusive = [];
                         condition.WeaponModsInclusive = [];
                     }
 
-                    if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveEnemyHealthEffect)))
+                    if (conditions.RemoveEnemyHealthEffect!.Value)
                     {
                         condition.EnemyHealthEffects?.Clear();
                     }
 
-                    if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveEnemyGear)))
+                    if (conditions.RemoveEnemyGear!.Value)
                     {
                         condition.EnemyEquipmentExclusive = [];
                         condition.EnemyEquipmentInclusive = [];
                     }
 
-                    if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveBodyPart)))
+                    if (conditions.RemoveBodyPart!.Value)
                     {
                         condition.BodyPart?.Clear();
                     }
 
-                    if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveDistance)))
+                    if (conditions.RemoveDistance!.Value)
                     {
                         condition.Distance = new CounterConditionDistance
                         {
@@ -444,7 +443,7 @@ public class Mod(
                         };
                     }
 
-                    if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveTime)) && (condition.Daytime is not null))
+                    if (conditions.RemoveTime!.Value && (condition.Daytime is not null))
                     {
                         condition.Daytime = new DaytimeCounter
                         {
@@ -463,8 +462,9 @@ public class Mod(
 
         foreach (var quest in questConfig.RepeatableQuests)
         {
-            var questId = quest.Id;
-            if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveFindInRaid)))
+            var conditions = config.GetConditionsWithOverrides(quest.Id);
+
+            if (conditions.RemoveFindInRaid!.Value)
             {
                 foreach (var completion in quest.QuestConfig.CompletionConfig)
                 {
@@ -480,7 +480,7 @@ public class Mod(
 
             foreach (var elim in elims)
             {
-                if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveTarget)))
+                if (conditions.RemoveTarget!.Value)
                 {
                     elim.Targets = [new ProbabilityObject<string, BossInfo> {
                         Key = "Any",
@@ -492,18 +492,18 @@ public class Mod(
                     }];
                 }
 
-                if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveWeapon)))
+                if (conditions.RemoveWeapon!.Value)
                 {
                     elim.WeaponCategoryRequirementChance = 0;
                     elim.WeaponRequirementChance = 0;
                 }
 
-                if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveBodyPart)))
+                if (conditions.RemoveBodyPart!.Value)
                 {
                     elim.BodyPartChance = 0;
                 }
 
-                if (config.ShouldModifyCondition(questId, nameof(ConditionsConfig.RemoveDistance)))
+                if (conditions.RemoveDistance!.Value)
                 {
                     elim.DistanceProbability = 0;
                 }

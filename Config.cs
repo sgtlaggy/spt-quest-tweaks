@@ -45,26 +45,51 @@ public record Config
         return false;
     }
 
-    public bool ShouldModifyCondition(MongoId questId, string condition)
+    public ConditionsConfig GetConditionsWithOverrides(MongoId questId)
     {
-        var prop = typeof(ConditionsConfig).GetProperty(condition)!;
+        ConditionsConfig conditions = new();
 
         ConditionsConfig? questOverride;
-        if (QuestOverrides.TryGetValue(questId, out questOverride))
+        QuestOverrides.TryGetValue(questId, out questOverride);
+
+        var properties = typeof(ConditionsConfig).GetProperties()
+            .Where((prop) => (prop.GetCustomAttribute(typeof(JsonPropertyNameAttribute)) is not null));
+        foreach (var prop in properties)
         {
-            var overrideValue = prop.GetValue(questOverride) as bool?;
-            if (overrideValue is not null)
+            if (questOverride is not null)
             {
-                return overrideValue.Value;
+                var overrideValue = prop.GetValue(questOverride);
+                if (overrideValue is not null)
+                {
+                    prop.SetValue(conditions, overrideValue);
+                    continue;
+                }
             }
+
+            if (IsQuestExempt(questId))
+            {
+                prop.SetValue(conditions, GetDefaultValue(prop));
+                continue;
+            }
+
+            prop.SetValue(conditions, prop.GetValue(GlobalConditions) ?? GetDefaultValue(prop));
         }
 
-        if (IsQuestExempt(questId))
+        return conditions;
+    }
+
+    private static object? GetDefaultValue(PropertyInfo property)
+    {
+        var type = property.PropertyType;
+        if (type == typeof(bool?))
         {
             return false;
         }
-
-        return (prop.GetValue(GlobalConditions) as bool?) ?? false;
+        else if (type == typeof(int?))
+        {
+            return -1;
+        }
+        return null;
     }
 
     public double? GetNewObjectiveValue(MongoId questId, string condition, double? original)
