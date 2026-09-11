@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers.Server;
@@ -15,22 +16,22 @@ namespace sgtlaggyQuestTweaks;
 public record Config
 {
     [JsonPropertyName("QualityOfLife")]
-    public required QualityOfLifeConfig QualityOfLife { get; set; }
+    public QualityOfLifeConfig QualityOfLife { get; set; } = new();
 
     [JsonPropertyName("GlobalConditions")]
-    public required GlobalConditionsConfig GlobalConditions { get; set; }
+    public GlobalConditionsConfig GlobalConditions { get; set; } = new();
 
     [JsonPropertyName("SpecialCases")]
-    public required SpecialCasesConfig SpecialCases { get; set; }
+    public SpecialCasesConfig SpecialCases { get; set; } = new();
 
     [JsonPropertyName("exemptQuests")]
-    public required HashSet<MongoId> ExemptQuests { get; set; }
+    public HashSet<MongoId> ExemptQuests { get; set; } = [];
 
     [JsonPropertyName("onlyQuests")]
-    public required HashSet<MongoId> OnlyQuests { get; set; }
+    public HashSet<MongoId> OnlyQuests { get; set; } = [];
 
     [JsonPropertyName("questOverrides")]
-    public required Dictionary<MongoId, ConditionsConfig> QuestOverrides { get; set; }
+    public Dictionary<MongoId, ConditionsConfig> QuestOverrides { get; set; } = [];
 
     public bool IsQuestExempt(MongoId questId)
     {
@@ -132,13 +133,13 @@ public record Config
 public record QualityOfLifeConfig
 {
     [JsonPropertyName("revealAllQuestObjectives")]
-    public bool RevealAllQuestObjectives { get; set; }
+    public bool RevealAllQuestObjectives { get; set; } = false;
 
     [JsonPropertyName("revealUnknownRewards")]
-    public bool RevealUnknownRewards { get; set; }
+    public bool RevealUnknownRewards { get; set; } = false;
 
     [JsonPropertyName("removeTimeGates")]
-    public bool RemoveTimeGates { get; set; }
+    public bool RemoveTimeGates { get; set; } = false;
 }
 
 public record ConditionsConfig
@@ -224,23 +225,26 @@ public record ConditionsConfig
 public record GlobalConditionsConfig : ConditionsConfig
 {
     [JsonPropertyName("affectRepeatables")]
-    public bool AffectRepeatables { get; set; }
+    public bool AffectRepeatables { get; set; } = true;
 }
 
 public record SpecialCasesConfig
 {
     [JsonPropertyName("lightkeeperOnlyRequireLevel")]
-    public int LightkeeperOnlyRequireLevel { get; set; }
+    public int LightkeeperOnlyRequireLevel { get; set; } = 0;
 
     [JsonPropertyName("tarkovShooterM10")]
-    public bool TarkovShooterM10 { get; set; }
+    public bool TarkovShooterM10 { get; set; } = false;
 
     [JsonPropertyName("collectorPrerequisiteBackport")]
-    public bool CollectorPrerequisiteBackport { get; set; }
+    public bool CollectorPrerequisiteBackport { get; set; } = false;
 }
 
-public class ConfigRegistration : IOnDIConstruct
+[Injectable(TypePriority = OnLoadOrder.Preload + 1)]
+public class ConfigRegistration(ISptLogger<ConfigRegistration> logger) : IOnDIConstruct, IOnLoad
 {
+    private static Exception? Error = default;
+
     public static async Task OnDIConstructAsync(
         IServiceCollection serviceCollection,
         CancellationToken cancellationToken
@@ -255,10 +259,27 @@ public class ConfigRegistration : IOnDIConstruct
             Converters = { new StringToMongoIdConverter() }
         };
 
-        var configJson = await File.ReadAllTextAsync(Path.Join(modDir, "config.json"), cancellationToken);
-        var config = JsonSerializer.Deserialize<Config>(configJson, jsonSerializerOptions)!;
+        try
+        {
+            var configJson = await File.ReadAllTextAsync(Path.Join(modDir, "config.json"), cancellationToken);
+            var config = JsonSerializer.Deserialize<Config>(configJson, jsonSerializerOptions)!;
+            serviceCollection.AddSingleton(config);
+        }
+        catch (Exception e)
+        {
+            Error = e;
+            serviceCollection.AddSingleton(new Config());
+        }
+    }
 
-        serviceCollection.AddSingleton(config);
+    public Task OnLoadAsync(CancellationToken cancellationToken)
+    {
+        if (Error is not null)
+        {
+            logger.Error("[QuestTweaks] Error loading config.", Error);
+        }
+
+        return Task.CompletedTask;
     }
 }
 

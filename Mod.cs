@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Common;
@@ -49,7 +50,8 @@ public class Mod(
     QuestConfig questConfig,
     TemplateTable templates,
     LocaleTable locales,
-    LocationTable locationsTable
+    LocationTable locationsTable,
+    ISptLogger<Mod> logger
 ) : IOnLoad
 {
     private readonly string _modDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
@@ -59,9 +61,17 @@ public class Mod(
     public Task OnLoadAsync(CancellationToken cancellationToken)
     {
         var allQuests = templates.Quests;
-        ModifySpecialCaseQuests(allQuests);
-        ModifyQuestsNonExemptSettings(allQuests);
-        ModifyQuestConditions(allQuests);
+
+        try
+        {
+            ModifySpecialCaseQuests(allQuests);
+            ModifyQuestsNonExemptSettings(allQuests);
+            ModifyQuestConditions(allQuests);
+        }
+        catch (Exception e)
+        {
+            logger.Error($"[QuestTweaks] Error modifying quests.", e);
+        }
 
 #if DEBUG
         // Dump modified quest database to a file for quick inspection in debug builds.
