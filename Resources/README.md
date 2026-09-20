@@ -24,7 +24,7 @@ Remove waiting periods after some quests like Gunsmith.
 
 ### Remove Tedious Conditions
 
-ℹ️ This is similar to [kiki-RemoveTediousQuestConditions](https://forge.sp-tarkov.com/mod/336/kiki-removetediousquestconditions) ([github](https://github.com/kieran-boyle/Mods/tree/master/Kiki-RemoveTediousQuestConditions)).
+ℹ️ This is similar to [kiki-RemoveTediousQuestConditions](https://sp-mod.com/mod/336/kiki-removetediousquestconditions) ([github](https://github.com/kieran-boyle/Mods/tree/master/Kiki-RemoveTediousQuestConditions)).
 
 The following objective conditions can be removed.
 Any marked with 🔃 also will also apply to repeatable quests by default.
@@ -70,7 +70,7 @@ To set overrides for repeatable quests use `615ffc701c97c768137e719b` for PMC da
 
 ### Only Require Level to start Lightkeeper
 
-ℹ️ This is the same feature provided by [Lightkeeper Questline Patch](https://forge.sp-tarkov.com/mod/1521/lightkeeper-questline-patch) ([github](https://github.com/aadithpm/spt-lightkeeper)).
+ℹ️ This is the same feature provided by [Lightkeeper Questline Patch](https://sp-mod.com/mod/1521/lightkeeper-questline-patch) ([github](https://github.com/aadithpm/spt-lightkeeper)).
 
 This option will remove all the prerequisite quests to start `Network Provider - Part 1` and will only require a specific level. A value of `0` will disable this feature and leave the prerequisites in place.
 
@@ -80,7 +80,7 @@ BSG only added it to 7 and 8, this option makes it work for 1-6 as well.
 
 ### Backport Collector Prerequisites from EFT 1.1.0.0
 
-This will completely replace the prerequisites, so is incompatible with other mods such as [Start Collector Early](https://forge.sp-tarkov.com/mod/1675/start-collector-early) ([github](https://github.com/m-barneto/StartCollectorEarly)) but should be compatible with [Updated collector quest and streamer case](https://forge.sp-tarkov.com/mod/2615/updated-collector-quest-and-streamer-case-eft-10-backport) ([github](https://github.com/GarfieldMD/CollectorBackportPatch)).
+This will completely replace the prerequisites, so is incompatible with other mods such as [Start Collector Early](https://sp-mod.com/mod/1675/start-collector-early) ([github](https://github.com/m-barneto/StartCollectorEarly)) but should be compatible with [Updated collector quest and streamer case](https://sp-mod.com/mod/2615/updated-collector-quest-and-streamer-case-eft-10-backport) ([github](https://github.com/GarfieldMD/CollectorBackportPatch)).
 
 New prerequisites:
 - Loyalty level 4👑 Prapor
