@@ -269,6 +269,13 @@ public class Mod(
         }
     }
 
+    private bool CounterConditionIsOnlyTransit(QuestConditionCounterCondition condition)
+    {
+        return (condition.ConditionType == "ExitStatus")
+               && (condition.Status!.Count == 1)
+               && condition.Status.Contains("Transit");
+    }
+
     private void ModifyQuestConditions(Dictionary<MongoId, Quest> quests)
     {
         var shouldModifyConditions = config.GlobalConditions.AnyChanged
@@ -317,6 +324,21 @@ public class Mod(
             var objectives = quest.Conditions.AvailableForFinish!;
             var conditions = config.GetConditionsWithOverrides(questId);
 
+            if (conditions.RemoveTransit!.Value && !conditions.RemoveInOneRaid!.Value)
+            {
+                conditions.RemoveInOneRaid = (
+                    (quest.Location == "marathon") // explicitly marked as transit task
+                    || (objectives.Any(
+                        (obj) => (
+                            (obj.ConditionType == "CounterCreator")
+                            && (obj.Counter!.Conditions!.Any(CounterConditionIsOnlyTransit))
+                        )
+                    ))
+                );
+            }
+
+            HashSet<MongoId> objectivesToRemove = [];
+
             foreach (var objective in objectives)
             {
                 if ((objective.OneSessionOnly ?? false) && conditions.RemoveInOneRaid!.Value)
@@ -353,6 +375,13 @@ public class Mod(
                 if (objective.ConditionType != "CounterCreator")
                 {
                     continue;
+                }
+
+                if (conditions.RemoveTransit!.Value
+                    && objective.Counter!.Conditions!.Any(CounterConditionIsOnlyTransit)
+                )
+                {
+                    objectivesToRemove.Add(objective.Id);
                 }
 
                 if (conditions.RemoveZone!.Value && !conditions.RemoveMap!.Value)
@@ -465,6 +494,21 @@ public class Mod(
                             To = 0
                         };
                     }
+                }
+            }
+
+            if (objectivesToRemove.Count > 0)
+            {
+                objectives.RemoveAll((objective) => objectivesToRemove.Contains(objective.Id));
+
+                foreach (var objective in objectives)
+                {
+                    objective.VisibilityConditions?.RemoveAll(
+                        (cond) => (
+                            (cond.ConditionType == "CompleteCondition")
+                            && objectivesToRemove.Contains(cond.Target!)
+                        )
+                    );
                 }
             }
         }

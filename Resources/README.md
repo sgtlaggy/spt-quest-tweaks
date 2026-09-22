@@ -38,9 +38,13 @@ Any marked with 🔃 also will also apply to repeatable quests by default.
 - Time
 - Map/location
 - Zone
-  - Removing zone but not map conditions will expand it to the map.
+  - Removing zone but not map conditions will expand it to the map
 - 🔃 Item found-in-raid status
 - In One Raid
+- Transit
+  - Removes transit objectives (does not conflict with [Transits Count](https://sp-mod.com/mod/2831/transits-count))
+  - Removes In One Raid restriction from transit quests
+  - This is similar to the feature of [Lacy’s PVE Tweaks](https://sp-mod.com/mod/2395/lacys-pve-tweaks)
 
 In overrides a value of `true` will remove the condition, `false` will keep the default condition, and `null` or omitting will use the global value.
 
