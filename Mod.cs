@@ -427,7 +427,7 @@ public class Mod(
                     || cond.ConditionType == "Location"
                     || cond.ConditionType == "InZone"))
                 {
-                    objective.Value = 0;
+                    objectivesToRemove.Add(objective.Id);
                     continue;
                 }
 
