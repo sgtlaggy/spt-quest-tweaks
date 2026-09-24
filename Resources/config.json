@@ -21,6 +21,7 @@
     "removeFindInRaid": false,
     "removeInOneRaid": false,
     "removeTransit": false,
+    "removeSurviveAfter": false,
     "handoverItemCount": -1,
     "handoverItemPercent": -1,
     "eliminationCount": -1,

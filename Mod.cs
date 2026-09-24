@@ -276,6 +276,15 @@ public class Mod(
                && condition.Status.Contains("Transit");
     }
 
+    private bool ObjectiveIsSingleSurvive(QuestCondition objective)
+    {
+        return (objective.ConditionType == "CounterCreator")
+               && (objective.Value == 1)
+               && objective.Counter!.Conditions!.Any(
+                   (cond) => ((cond.ConditionType == "ExitStatus")
+                              && cond.Status!.Contains("Survived")));
+    }
+
     private void ModifyQuestConditions(Dictionary<MongoId, Quest> quests)
     {
         var shouldModifyConditions = config.GlobalConditions.AnyChanged
@@ -509,6 +518,26 @@ public class Mod(
                             && objectivesToRemove.Contains(cond.Target!)
                         )
                     );
+                }
+            }
+
+            if (conditions.RemoveSurviveAfter!.Value
+                && objectives.Any((obj) => (!ObjectiveIsSingleSurvive(obj)))
+            )
+            {
+                QuestCondition? survive;
+                try
+                {
+                    survive = objectives.SingleOrDefault(ObjectiveIsSingleSurvive);
+                }
+                catch (InvalidOperationException)
+                {
+                    survive = null;
+                }
+
+                if (survive is not null)
+                {
+                    objectives.Remove(survive);
                 }
             }
         }
