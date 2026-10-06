@@ -365,6 +365,10 @@ public class Mod(
                     if (!ObjectiveTargetItemIsQuestOrSpecial(objective))
                     {
                         objective.Value = config.GetNewObjectiveValue(conditions, "HandoverItem", objective.Value);
+                        if (objective.Value == 0)
+                        {
+                            objectivesToRemove.Add(objective.Id);
+                        }
                     }
                 }
 
@@ -378,6 +382,10 @@ public class Mod(
                     if (!ObjectiveTargetItemIsQuestOrSpecial(objective))
                     {
                         objective.Value = config.GetNewObjectiveValue(conditions, "PlantItem", objective.Value);
+                        if (objective.Value == 0)
+                        {
+                            objectivesToRemove.Add(objective.Id);
+                        }
                     }
                 }
 
@@ -391,6 +399,10 @@ public class Mod(
                     if (!ObjectiveTargetItemIsQuestOrSpecial(objective))
                     {
                         objective.Value = config.GetNewObjectiveValue(conditions, "PlaceProtect", objective.Value);
+                        if (objective.Value == 0)
+                        {
+                            objectivesToRemove.Add(objective.Id);
+                        }
                     }
                 }
 
@@ -463,6 +475,10 @@ public class Mod(
                     if (condition.ConditionType == "Kills")
                     {
                         objective.Value = config.GetNewObjectiveValue(conditions, "Elimination", objective.Value);
+                        if (objective.Value == 0)
+                        {
+                            objectivesToRemove.Add(objective.Id);
+                        }
                     }
 
                     if (conditions.RemoveTarget!.Value)
