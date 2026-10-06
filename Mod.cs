@@ -362,22 +362,35 @@ public class Mod(
                         objective.OnlyFoundInRaid = false;
                     }
 
-                    TemplateItem? item;
-                    if (objective.Target!.IsList)
-                    {
-                        items.TryGetValue(objective.Target.List![0], out item);
-                    }
-                    else
-                    {
-                        items.TryGetValue(objective.Target.Item!, out item);
-                    }
-
-                    if ((item is not null)
-                        && (item.Properties!.QuestItem != true)
-                        && !Constants.KeyClasses.Contains(item.Parent)
-                        && !Constants.HandoverCountItemBlacklist.Contains(item.Id))
+                    if (!ObjectiveTargetItemIsQuestOrSpecial(objective))
                     {
                         objective.Value = config.GetNewObjectiveValue(conditions, "HandoverItem", objective.Value);
+                    }
+                }
+
+                if (objective.ConditionType == "LeaveItemAtLocation")
+                {
+                    if (conditions.PlantItemTime >= 0)
+                    {
+                        objective.PlantTime = conditions.PlantItemTime;
+                    }
+
+                    if (!ObjectiveTargetItemIsQuestOrSpecial(objective))
+                    {
+                        objective.Value = config.GetNewObjectiveValue(conditions, "PlantItem", objective.Value);
+                    }
+                }
+
+                if (objective.ConditionType == "PlaceBeacon")
+                {
+                    if (conditions.PlaceProtectTime >= 0)
+                    {
+                        objective.PlantTime = conditions.PlaceProtectTime;
+                    }
+
+                    if (!ObjectiveTargetItemIsQuestOrSpecial(objective))
+                    {
+                        objective.Value = config.GetNewObjectiveValue(conditions, "PlaceProtect", objective.Value);
                     }
                 }
 
@@ -596,5 +609,27 @@ public class Mod(
                 }
             }
         }
+    }
+
+    private bool ObjectiveTargetItemIsQuestOrSpecial(QuestCondition objective)
+    {
+        TemplateItem? item;
+        if (objective.Target!.IsList)
+        {
+            templates.Items.TryGetValue(objective.Target.List![0], out item);
+        }
+        else
+        {
+            templates.Items.TryGetValue(objective.Target.Item!, out item);
+        }
+
+        if (item is null)
+        {
+            return false;
+        }
+
+        return (item.Properties!.QuestItem == true)
+               || Constants.KeyClasses.Contains(item.Parent)
+               || Constants.HandoverCountItemBlacklist.Contains(item.Id);
     }
 }

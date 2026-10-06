@@ -51,13 +51,15 @@ In overrides a value of `true` will remove the condition, `false` will keep the 
 
 An additional setting toggles whether these also apply to repeatable quests.
 
-### Set Number For Eliminations and Items to Hand Over
+### Set Number For Eliminations and Items to Hand Over / Plant / Place
 
 These options will set a percent of original value or flat value across the board for all quests to use when requiring kills or item turn-ins, respected by ‘exemptQuests‘ list.
 
 Negative values indicate not to change the value in global settings and overrides. `null` or omitting in an override will use the global value.
 
-The item setting does not apply to quest items like the Bronze Pocket Watch or keys/keycards.
+The item settings do not apply to quest items like the Bronze Pocket Watch or keys/keycards.
+
+PlantItem is for hold-key objectives like Chumming, PlaceProtect is for objectives with the animation like BP Depot.
 
 ### Overrides
 

@@ -220,6 +220,24 @@ public record ConditionsConfig
     [JsonPropertyName("eliminationPercent")]
     public int? EliminationPercent { get; set; }
 
+    [JsonPropertyName("plantItemCount")]
+    public int? PlantItemCount { get; set; }
+
+    [JsonPropertyName("plantItemPercent")]
+    public int? PlantItemPercent { get; set; }
+
+    [JsonPropertyName("plantItemTime")]
+    public int? PlantItemTime { get; set; }
+
+    [JsonPropertyName("placeProtectCount")]
+    public int? PlaceProtectCount { get; set; }
+
+    [JsonPropertyName("placeProtectPercent")]
+    public int? PlaceProtectPercent { get; set; }
+
+    [JsonPropertyName("placeProtectTime")]
+    public int? PlaceProtectTime { get; set; }
+
     [JsonIgnore]
     public bool AnyChanged
     {
@@ -242,7 +260,13 @@ public record ConditionsConfig
                || (HandoverItemCount >= 0)
                || (HandoverItemPercent >= 0)
                || (EliminationCount >= 0)
-               || (EliminationPercent >= 0);
+               || (EliminationPercent >= 0)
+               || (PlantItemCount >= 0)
+               || (PlantItemPercent >= 0)
+               || (PlantItemTime >= 0)
+               || (PlaceProtectCount >= 0)
+               || (PlaceProtectPercent >= 0)
+               || (PlaceProtectTime >= 0);
     }
 }
 

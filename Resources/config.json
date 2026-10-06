@@ -25,7 +25,13 @@
     "handoverItemCount": -1,
     "handoverItemPercent": -1,
     "eliminationCount": -1,
-    "eliminationPercent": -1
+    "eliminationPercent": -1,
+    "plantItemCount": -1,
+    "plantItemPercent": -1,
+    "plantItemTime": -1,
+    "placeProtectCount": -1,
+    "placeProtectPercent": -1,
+    "placeProtectTime": -1
   },
   "SpecialCases": {
     "lightkeeperOnlyRequireLevel": 0,
